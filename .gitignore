@@ -1,0 +1,5 @@
+*.pyc
+build
+chimeraenv
+chimeraxtest.egg-info
+dist

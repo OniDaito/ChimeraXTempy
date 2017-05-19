@@ -1,0 +1,4 @@
+pdb_name	score	lrms	class
+mod_9	1.22326	0.000	1
+mod_0	1.21519	1.183	1
+mod_2	1.11912	0.000	2

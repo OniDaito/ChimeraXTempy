@@ -1,0 +1,15 @@
+Start time : 1458816823.01
+------------------------------------------------------------------------------------------
+GAMMA-TEMPy
+Genetic Algorithm for Modelling Macromolecular Assemblies
+------------------------------------------------------------------------------------------
+Input assembly                : ../2dqj_rand.pdb
+Input map                     : ../2dqj_10A_tempy.mrc
+Resolution (angstrom)         : 10
+Mutation rate                 : 0.02
+Crossover rate                : 0.8
+Mutation ofset                : 0.0
+Goodness-of-fit score         : Mutual Information
+Prefix of the output filename : 2dqj_run1
+Output assembly model after every generation : No
+Map vector quantisation file  : 2dqj_run1_vq.pdb

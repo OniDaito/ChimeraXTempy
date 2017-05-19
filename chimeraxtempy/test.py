@@ -1,0 +1,2 @@
+import chimerax
+print("Testing")
