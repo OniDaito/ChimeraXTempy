@@ -1,2 +1,0 @@
-import chimerax
-print("Testing")
