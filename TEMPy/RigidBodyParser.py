@@ -58,7 +58,8 @@ class RBParser:
 				tokens = line.split()
 				if len(tokens) < 2: continue
 				chainID = ''
-				for i in range(len(tokens)/2):
+        # Assumption that tokens are always integer multiples of two
+				for i in range(int(len(tokens)/2)):
 					start = int(tokens[i*2].split(':')[0])
 					end = int(tokens[i*2+1].split(':')[0])
 					sselist.append([start,end])
@@ -66,7 +67,7 @@ class RBParser:
 						chainID = tokens[i*2].split(':')[1]
 						if not tokens[i*2+1].split(':')[1] == chainID:
 							print('Check chain IDs in rigid body file', tokens[i*2])
-		#Combine SSEs into one structure
+		    #Combine SSEs into one structure
 				sse_struct_list = structure_instance.break_into_segments(sselist,chainID)
 				sse_struct = structure_instance.combine_SSE_structures(sse_struct_list)
 				RB_structureinstance_tot.append(sse_struct.copy())

@@ -14,6 +14,12 @@ from TEMPy.ScoringFunctions import ScoringFunctions
 from TEMPy.class_arg import TempyParser
 
 from chimerax.core.tools import ToolInstance
+from chimerax.core.models import Models
+
+from chimerax.core.map.volume import Volume
+from chimerax.core.atomic.structure import AtomicStructure
+ 
+import os
 
 class ToolUI(ToolInstance):
 
@@ -22,6 +28,7 @@ class ToolUI(ToolInstance):
     # Standard template stuff
     ToolInstance.__init__(self, session, tool_name)
     self.display_name = "Tempy"
+  
     from chimerax.core.ui.gui import MainToolWindow
     self.tool_window = MainToolWindow(self)
     self.tool_window.manage(placement="side")
@@ -30,19 +37,32 @@ class ToolUI(ToolInstance):
     # UI consists of a chain selector and search button on top
     # and HTML widget below for displaying results.
     # Layout all the widgets
-    from PyQt5.QtWidgets import QGridLayout, QLabel, QComboBox, QPushButton
+    from PyQt5.QtWidgets import QLineEdit, QGridLayout, QLabel, QComboBox, QPushButton
     from chimerax.core.ui.widgets import HtmlView
+    
     layout = QGridLayout()
     layout.setContentsMargins(0, 0, 0, 0)
+    # Scoring 
     label = QLabel("SCCC Score:")
     layout.addWidget(label, 0, 0)
     button = QPushButton("calculate")
     button.clicked.connect(self._sccc_score)
     layout.addWidget(button, 0, 2)
-    self.results_view = HtmlView(parent, size_hint=(575, 300),
-                                 interceptor=self._html_view,
-                                 schemes=[])
-    layout.addWidget(self.results_view, 1, 0, 1, 3)
+    
+    # Rigid file
+    button_file = QPushButton("select rigid file")
+    label_file = QLabel("Rigid filename:")
+    self._widget_rigid_file = QLineEdit()
+    
+    button_file.clicked.connect(self._select_rigid_file)
+    layout.addWidget(button_file,1,2)
+    layout.addWidget(self._widget_rigid_file,1,1)
+    layout.addWidget(label_file,1,0)
+
+    #self.results_view = HtmlView(parent, size_hint=(575, 300),
+    #                             interceptor=self._html_view,
+    #                             schemes=[])
+    #layout.addWidget(self.results_view, 1, 0, 1, 3)
     layout.setColumnStretch(0, 0)
     layout.setColumnStretch(1, 10)
     layout.setColumnStretch(2, 0)
@@ -58,54 +78,63 @@ class ToolUI(ToolInstance):
 
   def _sccc_score(self):
     print("Calculating SMOC Score")
-    tp = TempyParser()
-    # OPTIONS
     m = "filemap"#tp.args.inp_map - current mrc file apparently
     r = 10.0 #tp.args.res
     c = "dunno" #tp.args.thr
     p = "thepdb" #tp.args.pdb - current pdb file
+   
+    atomic_model = None
+    map_model = None
+
+    # TODO - Proper checks for existance
+    rb_file = self._widget_rigid_file.text()
+   
+    # Looking for currently selected maps and similar
+    print(self.session.models.list())
+  
+   
+    # TODO - For now find the first AtomicStructure and first Volume (eventually, do selected and throw errors)
     
+    for mm in self.session.models.list():
+      if isinstance(mm, AtomicStructure):
+        atomic_model = mm
+        break
+    
+    for mm in self.session.models.list():
+      if isinstance(mm, Volume):
+        map_model = mm
+        break
+    
+
     # the sigma factor determines the width of the Gaussian distribution used to describe each atom
+    # TODO - this needs to be a slider or textbox
     sim_sigma_coeff = 0.187
-    if not tp.args.sigfac is None:
-        sim_sigma_coeff = tp.args.sigfac
-    
-    return
-    #GET INPUT DATA
-    if flag_example:
-        m = os.path.join(path_example,'1akeA_10A.mrc')
-        p = os.path.join(path_example,'1ake_mdl1.pdb')
-        r = 10.0
-        rb_file = os.path.join(path_example,'1ake_mdl1_rigid.txt')
-    elif None in [m1,m2]:
-        # for one map and model
-        m = tp.args.inp_map
-        print('reading map')
-        Name1 = os.path.basename(m).split('.')[0]
-        emmap1=MapParser.readMRC(m)
-        if r1 is None and r is None: sys.exit('Input a map and model, map resolution (required)')
-        elif r1 is None: r1 = r
-        if all(x is None for x in [p,p1,p2]): sys.exit('Input a map and model, map resolution (required)')
-        elif None in [p1,p2]: p = tp.args.pdb
-        else: sys.exit('Input a map and model, map resolution (required)')
-        rb_file = tp.args.rigidfile
-        if rb_file is None: sys.exit('Rigid body file missing')
+
+ 
+    # TODO - replace this with the current loaded map
+    #emmap = MapParser.readMRC(map_model_filename)
 
     # make class instances for density simulation (blurring), scoring and plot scores
     blurrer = StructureBlurrer()
     scorer = ScoringFunctions()
 
     # read map file
-    emmap=MapParser.readMRC(m)
+    #emmap=MapParser.readMRC(m)
+    
     # read PDB file
-    structure_instance=PDBParser.read_PDB_file('pdbfile',p,hetatm=False,water=False)
+    # TODO - we need to change this to current selected PDB Model
+    #structure_instance=PDBParser.read_PDB_file('pdbfile',p,hetatm=False,water=False)
    
     SCCC_list_structure_instance=[]
     # read rigid body file and generate structure instances for each segment
-    listRB=RBParser.read_FlexEM_RIBFIND_files(rb_file,structure_instance)
+    listRB = RBParser.read_FlexEM_RIBFIND_files(rb_file, atomic_model)
+    
     # score each rigid body segment
     listsc_sccc = []
     print('calculating scores')
+
+    return
+
     for RB in listRB:
       # sccc score
       score_SCCC=scorer.SCCC(emmap,r,sim_sigma_coeff,structure_instance,RB,c_mode=False)
@@ -161,7 +190,11 @@ class ToolUI(ToolInstance):
     #  for sc in listsc_sccc: scf.write(str(sc)+"\n")
     #  scf.close()
       
-
+  def _select_rigid_file(self):
+    from PyQt5.QtWidgets import QFileDialog
+    filename = QFileDialog.getOpenFileName(None, 'OpenFile')
+    print(filename)
+    self._widget_rigid_file.setText(filename[0])
 
   def _html_view(self):
     print("HTML Test")
