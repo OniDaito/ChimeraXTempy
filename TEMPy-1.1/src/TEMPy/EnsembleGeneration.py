@@ -44,12 +44,12 @@ class EnsembleGeneration:
         structure_list=[]
         list_rotate_models=[filein for filein in os.listdir(path_dir) if file_name_flag in filein and filein[-4:]=='.pdb' ]
         for pdbin in list_rotate_models:
-            print pdbin
+            print(pdbin)
             if pdb==True:
                 file_in=path_dir+'/'+pdbin
                 #print file_in
                 if verbose==True:
-                    print "load file:",pdbin[:-4],file_in
+                    print("load file:",pdbin[:-4],file_in)
                 structure_instance=PDBParser.read_PDB_file(str(pdbin[:-4]),str(file_in),hetatm=hetatm,water=water)
                 structure_list.append([pdbin[:-4],structure_instance])
         return structure_list
@@ -128,7 +128,7 @@ class EnsembleGeneration:
         
         grain = loc_rotation_angle/no_of_structs
         if int(grain)<1:
-            print "Warning: less then 1deg rotation"
+            print("Warning: less then 1deg rotation")
         else:
             transl_x=linspace(0, translation_vector[0], num=no_of_structs)
             transl_y=linspace(0, translation_vector[1], num=no_of_structs)

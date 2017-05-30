@@ -370,10 +370,10 @@ def _rotmat_to_axisangle(mat):
     trace_mat=float(mat[0,0])+float(mat[1,1])+float(mat[2,2])
 
     if trace_mat > 3.0:
-        print '_rotmat_to_axisangle trace_mat to large:', trace_mat
+        print('_rotmat_to_axisangle trace_mat to large:', trace_mat)
         trace_mat =  3.0
     if trace_mat < -1.0:
-        print '_rotmat_to_axisangle trace_mat to small:', trace_mat
+        print('_rotmat_to_axisangle trace_mat to small:', trace_mat)
         trace_mat = -1.0
 
     theta1=acos((trace_mat-1)/2.0)
@@ -439,6 +439,6 @@ def align_2seqs(seq1,seq2):
     aln1 = Bio.pairwise2.align.globalms(''.join(seq1),''.join(seq2),1,-1,-0.5,-0.1)[0]
     align_seq1,align_seq2 = list(aln1[0]),list(aln1[1])
   except:
-    print 'ImportError: Bio.pairwise2'
+    print('ImportError: Bio.pairwise2')
     return
   return align_seq1,align_seq2

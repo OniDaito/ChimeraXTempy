@@ -65,7 +65,7 @@ class RBParser:
 					if ':' in tokens[i*2]:
 						chainID = tokens[i*2].split(':')[1]
 						if not tokens[i*2+1].split(':')[1] == chainID:
-							print 'Check chain IDs in rigid body file', tokens[i*2]
+							print('Check chain IDs in rigid body file', tokens[i*2])
 		#Combine SSEs into one structure
 				sse_struct_list = structure_instance.break_into_segments(sselist,chainID)
 				sse_struct = structure_instance.combine_SSE_structures(sse_struct_list)
@@ -76,14 +76,14 @@ class RBParser:
 			try:
 				return RB_structureinstance_tot
 			except UnboundLocalError:
-				print "wrong residues number"
+				print("wrong residues number")
 	
 		else:
 			for structure in RB_structureinstance_tot:
 				try:
 					return structure
 				except UnboundLocalError:
-					print "wrong residues number"
+					print("wrong residues number")
 
 
 	@staticmethod

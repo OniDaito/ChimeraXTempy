@@ -141,7 +141,7 @@ class MapParser:
         #print 'Axis order: ', crs_index
         #print 'Nstart', nstart_index[crs_index[0]-1],nstart_index[crs_index[1]-1],nstart_index[crs_index[2]-1]
 
-	flag_orig = 0
+        flag_orig = 0
         list_orig = [0.0, 0.0, 0.0]
 
         try:
@@ -169,7 +169,7 @@ class MapParser:
                         list_orig[crs_index[2]-1] = nstart[2]
                         origin = (list_orig[0],list_orig[1],list_orig[2])
 
-	'''
+        '''
         if (nstart[0] == 0 and nstart[1] == 0 and nstart[2] == 0) or (isnan(nstart[0]) or isnan(nstart[1]) or isnan(nstart[2])):
                 origin = (0.0, 0.0, 0.0)
                 #print 'NSTART records empty, Checking ORIGIN records...'
@@ -198,7 +198,7 @@ class MapParser:
         if endian == '>':
             #print 'Byte order swapped!'
             map_data.byteswap(True)
-	map_data=map_data.reshape(box_size)
+        map_data=map_data.reshape(box_size)
         map_data=array(map_data, dtype='float64')
 
 	### Check crs to xyz match

@@ -856,9 +856,9 @@ REMARK    MODEL GENERATE WITH TEMPY
         else:
             noc = self.no_of_chains()
             if len(chain_list) != self.no_of_chains():
-                print 'No. of chains in structure = '+str(noc)
-                print 'Length of chain list = '+str(len(chain_list))
-                print 'Chains not changed.'
+                print('No. of chains in structure = '+str(noc))
+                print('Length of chain list = '+str(len(chain_list)))
+                print('Chains not changed.')
                 return
         ch = self.atomList[0].chain
         renum = 0
@@ -962,7 +962,7 @@ REMARK    MODEL GENERATE WITH TEMPY
 
                         if otherStruct.atomList[a].atom_name == 'CA':
                             dists.append(self.atomList[a].distance_from_atom(otherStruct.atomList[a]))
-                            print self.atomList[a].atom_name, otherStruct.atomList[a].atom_name,self.atomList[a].res_no, otherStruct.atomList[a].res_no
+                            print(self.atomList[a].atom_name, otherStruct.atomList[a].atom_name,self.atomList[a].res_no, otherStruct.atomList[a].res_no)
  
                         else:
                             pass
@@ -1087,7 +1087,7 @@ REMARK    MODEL GENERATE WITH TEMPY
         if len(newAtomList)!=0:
             return BioPy_Structure(newAtomList)
         else:
-            print "Warning no chain %s found"%chainID
+            print("Warning no chain " + chainID + "found")
     
     
     def get_selection(self, startRes, finishRes, chain=''):
@@ -1149,7 +1149,7 @@ REMARK    MODEL GENERATE WITH TEMPY
             else:
                 structList.append(fstStruct)
         if len(structList) ==0:
-        	print "Error: Residues not in PDB."
+        	print("Error: Residues not in PDB.")
         	sys.exit()
         else:
         	return structList
@@ -1163,7 +1163,7 @@ REMARK    MODEL GENERATE WITH TEMPY
         if len(newAtomList)!=0:
             return BioPy_Structure(newAtomList)
         else:
-            print "Warning no chain %s found"%chainID
+            print("Warning no chain " + chainID + " found")
 
     #PAP ADDITION
     def get_rgyration(self):

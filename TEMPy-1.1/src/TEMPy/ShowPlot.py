@@ -107,7 +107,7 @@ class Plot:
             ind = hier.fcluster(linkageMatrixZ, rms_cutoff, 'distance')
             ind=ind.ravel()
             ind=ind[index,]
-            print zip(mxscore.ravel().tolist(),cluster_dendro,ind)
+            print(zip(mxscore.ravel().tolist(),cluster_dendro,ind))
             return zip(mxscore.ravel().tolist(),cluster_dendro,ind)
 
     def ShowRMSDmatrix(self,mxRMSD,name='RMSDmatrix',save=False):
@@ -275,7 +275,7 @@ class Plot:
         line="model\tscore\tclusterRMSD\n"
         for x in cluster_output:
             line+='%s\t%s\t%s\n'%(x[1],x[0],x[-1])
-        print line
+        print(line)
         if write==True:
             file_out=open(file_name,'w')
             file_out.write(line)
@@ -319,7 +319,7 @@ class Plot:
         #print len(list_mod_load)
         for lab in list_mod_load:
             file_num=lab.split('.')[0].split('_')[-1]
-            print lab,file_num
+            print(lab,file_num)
             for mod in list_mod:
                 #if mod in lab:
                 if mod == file_num:
@@ -390,7 +390,7 @@ class Plot:
                 if ':' in tokens[i*2]:
                     chainID = tokens[i*2].split(':')[1]
                     if not tokens[i*2+1].split(':')[1] == chainID:
-                        print 'Check chain IDs in rigid body file', tokens[i*2]
+                        print('Check chain IDs in rigid body file', tokens[i*2])
                         chainID = ''
                     start = int(tokens[i*2].split(':')[0])
                     end = int(tokens[i*2+1].split(':')[0])

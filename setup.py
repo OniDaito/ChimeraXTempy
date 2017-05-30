@@ -77,14 +77,17 @@ setup(
     python_requires=">= 3.5",
     package_dir={
         "chimerax.tempy": "src",
+        # Wonder if we should put TEMPy in here?
     },
     packages=[
         "chimerax.tempy",
+        "chimerax.tempy.TEMPy",
     ],
     ext_modules=ext_mods,
     install_requires=[
         # list dependences on non-standard Python packages incl. ChimeraX ones
         "ChimeraX-Core",
+        "TEMPy",
     ],
     classifiers=[
         # From https://pypi.python.org/pypi?%3Aaction=list_classifiers

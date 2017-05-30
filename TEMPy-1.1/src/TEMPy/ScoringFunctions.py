@@ -119,7 +119,7 @@ class ScoringFunctions:
         else: return False
 
     def _failed_match(self):
-        print "Warning: can't match the map at the moment, use map with same box size." #comment all out!
+        print("Warning: can't match the map at the moment, use map with same box size.") #comment all out!
         sys.exit()
     
     def _CCC_calc(self,m1,m2):
@@ -211,7 +211,7 @@ class ScoringFunctions:
                 if not minim == 0.0:perc_ovr = float(numsum(mask_array))/minim
                 else:
                     perc_ovr = 0.0
-                    print 'No map overlap (Cross correlation score), exiting score calculation..'
+                    print('No map overlap (Cross correlation score), exiting score calculation..')
                     return -1.0, 0.0
                 if perc_ovr < 0.02: return -1.0, 0.0
             else: perc_ovr = 1.0
@@ -220,7 +220,7 @@ class ScoringFunctions:
             if mode == 3:
                 #mask_array = self._overlap_map_array(map_target,map_target_threshold,map_probe,map_probe_threshold)
                 if numsum(mask_array) == 0:
-                    print 'No map overlap (Cross correlation score), exiting score calculation..'
+                    print ('No map overlap (Cross correlation score), exiting score calculation..')
                     return -1.0, 0.0
                 map1_mask = map_target.fullMap[mask_array]
                 map2_mask = map_probe.fullMap[mask_array]
@@ -270,7 +270,7 @@ class ScoringFunctions:
                 return numsum(map_target.fullMap * map_probe.fullMap)/sqrt(numsum(square(map_target.fullMap))*numsum(square(map_probe.fullMap))), perc_ovr
             else: return corr, perc_ovr
         else:
-            print "@@@ Maps could not be matched"
+            print("@@@ Maps could not be matched")
             return -1., 0.
 
 
@@ -448,8 +448,8 @@ class ScoringFunctions:
         """
         
         if Filter not in ['Sobel','Laplace','Mean','Minimum',None]:
-        	print "Incorrect name of filter: %s" % Filter
-        	print "Select one of the following Filters if applicable: %s\n" % ', '.join(['Sobel','Laplace'])
+        	print("Incorrect name of filter: " + Filter)
+        	print("Select one of the following Filters if applicable: " + ''.join(['Sobel','Laplace']))
         	sys.exit()
         
         scores = []
@@ -530,13 +530,13 @@ class ScoringFunctions:
                         ang = 0.0
                     else:
                         ang = math.acos(min(max(dotprod/den,-1.0),1.0))
-                    if den == 0.0: print dotprod, den, nvec, ovec
+                    if den == 0.0: print(dotprod, den, nvec, ovec)
                     scores.append(abs(ang))   
                 except ValueError:
-                    print 'Error: Angle could not be calculated: ', nvec,' ', ovec
+                    print('Error: Angle could not be calculated: ', nvec,' ', ovec)
             #print scores[-10:]
             if len(scores) == 0:
-                print "There are no points to be scored! The threshold values or the number of points to be considered needs to be changed."
+                print("There are no points to be scored! The threshold values or the number of points to be considered needs to be changed.")
                 return None
             else:
                 if sum(scores) == 0:
@@ -565,9 +565,9 @@ class ScoringFunctions:
                 try:
                     scores.append(abs(n_vec.arg(o_vec)))
                 except ValueError:
-                    print 'Error: Angle between '+ str(n_vec) +', '+ str(o_vec) +' for point %d, %d, %d cannot be calculated.' %(v.x,v.y,v.z)
+                    print('Error: Angle between '+ str(n_vec) +', '+ str(o_vec) +' for point %d, %d, %d cannot be calculated.',v.x,v.y,v.z)
         if len(scores) == 0:
-            print "There are no points to be scored! The threshold values or the number of points to be considered needs to be changed."
+            print ("There are no points to be scored! The threshold values or the number of points to be considered needs to be changed.")
         else:
             if sum(scores) == 0:
                 return 0
@@ -817,18 +817,18 @@ class ScoringFunctions:
             # For score within masked region, the background is a bit ambiguous because low densities are overrepresented
             mask_array = self._overlap_map_array(map_target,map_target_threshold,map_probe,map_probe_threshold)
             if numsum(mask_array) == 0:
-                print 'No map overlap (Mutual information score), exiting score calculation..'
+                print('No map overlap (Mutual information score), exiting score calculation..')
                 return 0.0
             # sturges rule provides a way of calculating number of bins : 1+math.log(number of points)
             if layers1 is None:
                 try: layers1=int(1+math.log(numsum(mask_array),2))
                 except ValueError:
-                    print 'No map overlap (Mutual information score), exiting score calculation..'
+                    print('No map overlap (Mutual information score), exiting score calculation..')
                     return 0.0
             if layers2 is None:
                 try: layers2=int(1+math.log(numsum(mask_array),2))
                 except ValueError:
-                    print 'No map overlap (Mutual information score), exiting score calculation..'
+                    print('No map overlap (Mutual information score), exiting score calculation..')
                     return 0.0
             layers1 = max(layers1,15)
             layers2 = max(layers2,15)
@@ -860,10 +860,10 @@ class ScoringFunctions:
         total = 0
 
         if numsum(map1_freq) == 0:
-            print 'No map overlap (Mutual information score), exiting score calculation..'
+            print('No map overlap (Mutual information score), exiting score calculation..')
             return 0.0
         if numsum(map2_freq) == 0:
-            print 'No map overlap (Mutual information score), exiting score calculation..'
+            print('No map overlap (Mutual information score), exiting score calculation..')
             return 0.0
         list_overlaps = []
         for x in range(layers1):
@@ -873,7 +873,7 @@ class ScoringFunctions:
             list_overlaps.append(overlap_freq)
 
         if total == 0:
-            print 'No map overlap (Mutual information score), exiting score calculation..'
+            print('No map overlap (Mutual information score), exiting score calculation..')
             return 0.0
         enter = 0
         Hxy = 0.0
@@ -958,17 +958,17 @@ class ScoringFunctions:
         else:
             self._failed_match()
             #m1,m2 = matchMaps(map_target, map_probe)
-        print "here"
+        print("here")
         if kdtree:
             return self._hausdorff_list(primary_boundary, secondary_boundary, kdtree, m2).mean()
         else:
-        	print m1,primary_boundary, secondary_boundary
+        	print(m1,primary_boundary, secondary_boundary)
         	kdtree = m1.makeKDTree(primary_boundary, secondary_boundary) #if you don't assine it wil be build one kdtree
         	if kdtree==None:
-        		print "Error. No points selected, change boundary parameters."
+        		print("Error. No points selected, change boundary parameters.")
         		sys.exit()
-        	else:
- 				return self._hausdorff_list(primary_boundary, secondary_boundary, kdtree, m2).mean()#mean distance to the nearest neighbour 
+      
+        return self._hausdorff_list(primary_boundary, secondary_boundary, kdtree, m2).mean()#mean distance to the nearest neighbour 
 
         # CHAMFER DISTANCE SCORE based on a defined surface based on modes
     def _surface_distance_score(self,map_target,map_probe,map_target_threshold1=0.0,map_probe_threshold=0.0,Filter=None,map_target_threshold2=0.0,weight=False):
@@ -1011,7 +1011,7 @@ class ScoringFunctions:
         """
         # check if both maps are on the same grid       
         if not self.mapComparison(map_target, map_probe):
-            print "@@@ Maps could not be matched"
+            print("@@@ Maps could not be matched")
             return -999.
         # if the boundaries are known, calculate the kdtree
         if Filter == None:
@@ -1029,7 +1029,7 @@ class ScoringFunctions:
                 target_points = npcopy(probe_points)
                 probe_points = npcopy(probe_points1)
             if len(target_points) == 0 or len(probe_points) == 0:
-              print 'Surface detection failed (Std filter), exiting..'
+              print ('Surface detection failed (Std filter), exiting..')
               return None
             try:
                 from scipy.spatial import cKDTree
@@ -1084,7 +1084,7 @@ class ScoringFunctions:
             target_points = argwhere((map1_filter.fullMap > 0.0) & (map1_filter.fullMap <= t1))
             probe_points = argwhere((map2_filter.fullMap > 0.0) & (map2_filter.fullMap <= t2))
             if len(target_points) == 0 or len(probe_points) == 0:
-                print 'Surface detection failed (Mean filter), exiting..'
+                print('Surface detection failed (Mean filter), exiting..')
                 return None
             #print len(target_points), len(probe_points), t1, t2
             # check whether the probe points is larger than the probe surface points. if not use the smaller one as probe point
@@ -1106,7 +1106,7 @@ class ScoringFunctions:
             target_points = argwhere(map1_surface == 1)
             probe_points = argwhere(map2_surface == 1)
             if len(target_points) == 0 or len(probe_points) == 0:
-                print 'Surface detection failed (Minimum filter), exiting..'
+                print('Surface detection failed (Minimum filter), exiting..')
                 return None
             #print len(target_points), len(probe_points)
             # stop if the number of points are large
@@ -1131,7 +1131,7 @@ class ScoringFunctions:
             target_points = argwhere(map1_surface.fullMap > map1_surface.max()/float(2))
             probe_points = argwhere(map2_surface.fullMap > map2_surface.max()/float(2))
             if len(target_points) == 0 or len(probe_points) == 0:
-                print 'Surface detection failed (Sobel filter), exiting..'
+                print('Surface detection failed (Sobel filter), exiting..')
                 return None
             #print len(target_points), len(probe_points)
              # check whether the probe points is larger than the probe surface points. if not use the smaller one as probe point
@@ -1215,7 +1215,7 @@ class ScoringFunctions:
             try:
                 perc_equiv = float(cumul_freq)/num_distances #/len(distances)
             except ZeroDivisionError:
-                print 'Distance weighting failed!!. Check surface defined'
+                print('Distance weighting failed!!. Check surface defined')
                 return None, None
             #sum_sc = sum_sc + (npexp(w/2.)*perc_equiv)
             #total += npexp(w/2.)
@@ -1339,10 +1339,10 @@ class ScoringFunctions:
             #print numsum(binmap1),numsum(binmap2),numsum(maskmap),minim
             if not minim == 0.0: return float(len(map_target.fullMap[maskmap]))/minim
             else:
-                print "Check map contour!!"
+                print("Check map contour!!")
                 return 0.0
         else:
-            print "@@@ Maps could not be matched"
+            print("@@@ Maps could not be matched")
             return -1.0
 
     def SCCC(self,map_target,resolution_densMap,sigma_map,structure_instance,rigid_body_structure,write=False,c_mode=True):
@@ -2087,7 +2087,7 @@ class ScoringFunctions:
                     C3 += ft2.fullMap[v[0]][v[1]][v[2]]*conjugate(ft2.fullMap[v[0]][v[1]][v[2]])
                     
             listC.append(abs(C1)/sqrt(abs(C2)*abs(C3)))
-            print abs(C1)/sqrt(abs(C2)*abs(C3)), (x+highlevel)/2.
+            print(abs(C1)/sqrt(abs(C2)*abs(C3)), (x+highlevel)/2.)
             lfreq.append(highlevel)
 
             sampling_frq = highlevel
@@ -2105,7 +2105,7 @@ class ScoringFunctions:
                         C3 += ft2.fullMap[v[0]][v[1]][v[2]]*conjugate(ft2.fullMap[v[0]][v[1]][v[2]])
                     
                 listC.append(abs(C1)/sqrt(abs(C2)*abs(C3)))
-                print abs(C1)/sqrt(abs(C2)*abs(C3)), (x+highlevel)/2.
+                print(abs(C1)/sqrt(abs(C2)*abs(C3)), (x+highlevel)/2.)
             
                 lfreq.append((highlevel+step/2))
                 break

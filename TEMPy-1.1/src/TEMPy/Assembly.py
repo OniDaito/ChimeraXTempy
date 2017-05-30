@@ -113,7 +113,7 @@ class Assembly:
         """
 
         if len(self.mapList) != len(self.structList):
-            print 'Maps not built yet'
+            print('Maps not built yet')
         else:
             for x in range(len(self.structList)):
                 com = self.structList[x].CoM.copy()
@@ -194,7 +194,7 @@ class Assembly:
 
         com = self.structList[index].CoM.copy()
         self.structList[index].rotate_by_euler(rx, ry, rz, 0, 0, 0)
-	self.structList[index].translate(tx,ty,tz)
+        self.structList[index].translate(tx,ty,tz)
         self.mapList[index] = self.mapList[index].rotate_by_euler(rx, ry, rz, com)
         self.mapList[index] = self.mapList[index].translate(tx,ty,tz)
 
@@ -212,9 +212,9 @@ class Assembly:
         """
 
         com = self.structList[index].CoM.copy()
-	self.structList[index].rotate_by_mat(mat)
-	self.structList[index].translate(tx,ty,tz)
-	self.mapList[index] = self.mapList[index].rotate_by_matrix(mat, com)
+        self.structList[index].rotate_by_mat(mat)
+        self.structList[index].translate(tx,ty,tz)
+        self.mapList[index] = self.mapList[index].rotate_by_matrix(mat, com)
         self.mapList[index] = self.mapList[index].translate(tx,ty,tz)
 
     def move_map_and_prot_by_quat(self, index, tx, ty, tz, q_param, mat):
@@ -236,7 +236,7 @@ class Assembly:
         """
         com = self.structList[index].CoM.copy()
         self.structList[index].rotate_by_quaternion(q_param)
-	self.structList[index].translate(tx,ty,tz)
+        self.structList[index].translate(tx,ty,tz)
         self.mapList[index] = self.mapList[index].rotate_by_matrix(mat, com)
         self.mapList[index] = self.mapList[index].translate(tx,ty,tz)
 
@@ -252,7 +252,7 @@ class Assembly:
         elif len(self.structList)==1:
             return self.structList[0]
         else:
-            print 'No structures found'
+            print('No structures found')
 
     def combine_maps(self):
         """
@@ -269,36 +269,38 @@ class Assembly:
         elif len(self.structList)==1:
             return self.mapList[0].copy()
         else:
-            print 'No maps found'
+            print('No maps found')
 	
     def make_VQ_points(self, threshold, noOfPoints, lap_fil, epochs=300):
-    	"""
-	
-	Cluster the density maps in the assembly object into n points using vector quantisation algorithm.
+      """
+
+      Cluster the density maps in the assembly object into n points using vector quantisation algorithm.
 
         Arguments:
 
-       	    *emmap*
+            *emmap*
                 Map (to be clustered) instance.
-       	    *threshold*
+            *threshold*
                 voxels with density above this value are used in the VQ run.
-       	    *noOfPoints*
+            *noOfPoints*
                 Number of Vector quantisation points to output.
-       	    *lap_fil*
+            *lap_fil*
                 True if you want to Laplacian filter the map first, False otherwise. Note that filtering the map change the density values of the map, which is relevant for the threshold parameter.
-       	    *epochs*
+            *epochs*
                 Number of iterations to run the Vector quantisation algorithm. Default is set to 300
 
         Return:
             A list of vector objects containing the vector quatisation points         
 
-    	"""
-
-        vq = []
-        if len(self.mapList) > 0:
-            for s in range(len(self.mapList)):
-                vq.append(get_VQ_points(self.mapList[s], threshold, noOfPoints[s], epochs, None, lap_fil))
-        return vq
+      """
+  
+      vq = []
+      
+      if len(self.mapList) > 0:
+        for s in range(len(self.mapList)):
+          vq.append(get_VQ_points(self.mapList[s], threshold, noOfPoints[s], epochs, None, lap_fil))
+      
+      return vq
 
     def write_all_to_files(self, templateName):
         """

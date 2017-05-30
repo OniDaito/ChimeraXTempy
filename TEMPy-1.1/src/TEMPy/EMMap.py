@@ -257,7 +257,7 @@ class Map:
         if offset[2] > 0:
                 nz = oz
 	
-	(lz,ly,lx) = ((m2z-nz)/float(s),(m2y-ny)/float(s),(m2x-nx)/float(s))
+        (lz,ly,lx) = ((m2z-nz)/float(s),(m2y-ny)/float(s),(m2x-nx)/float(s))
         if m2x < m1x: lx = (m1x-nx)/float(s)
         if m2y < m1y: ly = (m1y-ny)/float(s)
         if m2z < m1z: lz = (m1z-nz)/float(s)
@@ -341,23 +341,23 @@ class Map:
         
 
     def _sobel_surface_mask(self,c):
-    	"""
+      """
         
-       Apply sobel filter on binned density maps 
-
-        Return:
+      Apply sobel filter on binned density maps 
+ 
+      Return:
             new Map instance         
         
-        """
+      """
 
-        newmap = self.copy()
-        binmap = newmap.fullMap > float(c)
-        sx = sobel(binmap,0,mode='constant')
-        sy = sobel(binmap,1,mode='constant')
-        sz = sobel(binmap,2,mode='constant')
-        newmap.fullMap = srt(sx*sx+sy*sy+sz*sz)
-        newmap.fullMap = binmap*newmap.fullMap
-        return newmap
+      newmap = self.copy()
+      binmap = newmap.fullMap > float(c)
+      sx = sobel(binmap,0,mode='constant')
+      sy = sobel(binmap,1,mode='constant')
+      sz = sobel(binmap,2,mode='constant')
+      newmap.fullMap = srt(sx*sx+sy*sy+sz*sz)
+      newmap.fullMap = binmap*newmap.fullMap
+      return newmap
 
     def _sobel_filter_contour(self,c):
         """
@@ -486,7 +486,7 @@ class Map:
     def _map_digitize(self,cutoff,nbins,left=False):
         try: from numpy import digitize
         except ImportError:
-            print 'Numpy Digitize missing, try v1.8'
+            print('Numpy Digitize missing, try v1.8')
         binMap = self.copy()
         bins = []
         step = (self.fullMap.max()-float(cutoff))/nbins
@@ -1278,7 +1278,7 @@ class Map:
             weave.inline(code,['new_grid','x_grid1','y_grid1','z_grid1','z_mask_ind','y_mask_ind','x_mask_ind','xind','yind','zind','nx','ny','nz','maparray'],headers=["<math.h>"])
             #print datetime.now().time()
         except:
-            print 'C++ interpolation failed!, using alternate mode'
+            print('C++ interpolation failed!, using alternate mode')
             # interpolation
             #print datetime.now().time()
             new_grid[z_grid,y_grid,x_grid] = (1.-(x_ind[x_grid]-x_gridL))*(1-(y_ind[y_grid]-y_gridL))*(1-(z_ind[z_grid]-z_gridL))*self.fullMap[z_gridL,y_gridL,x_gridL]+self.fullMap[z_gridL,y_gridL,x_gridL+1]*(x_ind[x_grid]-x_gridL)*(1-(y_ind[y_grid]-y_gridL))*(1-(z_ind[z_grid]-z_gridL))+self.fullMap[z_gridL,y_gridL+1,x_gridL]*(1.-(x_ind[x_grid]-x_gridL))*(y_ind[y_grid]-y_gridL)*(1-(z_ind[z_grid]-z_gridL))+self.fullMap[z_gridL+1,y_gridL,x_gridL]*(1.-(x_ind[x_grid]-x_gridL))*(1-(y_ind[y_grid]-y_gridL))*(z_ind[z_grid]-z_gridL)+self.fullMap[z_gridL+1,y_gridL,x_gridL+1]*(x_ind[x_grid]-x_gridL)*(1-(y_ind[y_grid]-y_gridL))*(z_ind[z_grid]-z_gridL)+self.fullMap[z_gridL+1,y_gridL+1,x_gridL]*(1.-(x_ind[x_grid]-x_gridL))*(y_ind[y_grid]-y_gridL)*(z_ind[z_grid]-z_gridL)+self.fullMap[z_gridL,y_gridL+1,x_gridL+1]*(x_ind[x_grid]-x_gridL)*(y_ind[y_grid]-y_gridL)*(1-(z_ind[z_grid]-z_gridL))+self.fullMap[z_gridL+1,y_gridL+1,x_gridL+1]*(x_ind[x_grid]-x_gridL)*(y_ind[y_grid]-y_gridL)*(z_ind[z_grid]-z_gridL)
@@ -1857,7 +1857,7 @@ class Map:
             #print datetime.now().time()
             return vecnorm
         except:
-            print 'C++ NV scoring run failed!, using alternate mode'
+            print('C++ NV scoring run failed!, using alternate mode')
             return None
         
     def get_normal_vector(self, x_pos, y_pos, z_pos):
@@ -1913,7 +1913,7 @@ class Map:
         atomList = []
         template = 'HETATM    1  C   NOR A   1      23.161  39.732 -25.038  1.00 10.00           C'
         m = self.copy()
-        print m.origin
+        print(m.origin)
         for x in range(1, (m.box_size()[0]-1)):
             for y in range(1, (m.box_size()[1]-1)):
                 for z in range(1, (m.box_size()[2]-1)):
@@ -2183,7 +2183,7 @@ class Map:
             low = all_dens[l_ind+1]
         if high-low < 0.0000002 or high < low:
             est_weight = long(numsum(new_map.fullMap > low)*new_map.apix**3/(vol_factor*1000))
-            print 'Exact molecular weight cannot be found. Approx. weight of '+str(est_weight)+' used instead.' 
+            print('Exact molecular weight cannot be found. Approx. weight of '+str(est_weight)+' used instead.') 
             
             return low
         thr = low+(high-low)/2
@@ -2225,7 +2225,7 @@ class Map:
         #print low, high
         if high-low < 0.0000002 or high<low:
             est_weight =  numsum((self.fullMap < low)*(self.fullMap > primary_boundary))
-            print 'Non optimal number of pixels to match. Try changing this value or increasing the size of err_percent '
+            print('Non optimal number of pixels to match. Try changing this value or increasing the size of err_percent ')
             return 1j
         
         thr = low+(high-low)/2
@@ -2265,7 +2265,7 @@ class Map:
 #         print low, high
         if high-low < 0.0000002 or high<low:
             est_weight =  numsum((self.fullMap < low)*(self.fullMap > primary_boundary))
-            print 'Non optimal number of pixels to match. Try changing this value or increasing the size of err_percent '
+            print('Non optimal number of pixels to match. Try changing this value or increasing the size of err_percent ')
             return 1j
         
         thr = high-(high-low)/2

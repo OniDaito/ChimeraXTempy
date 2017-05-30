@@ -181,7 +181,7 @@ class StructureBlurrer:
             list_points = gridtree.query_ball_point([atom.x,atom.y,atom.z], atom.vdw)
             return list_points, (x_pos, y_pos, z_pos)
         else:
-            print "Warning, atom out of map box"
+            print("Warning, atom out of map box")
             return [], ()
 
     def maptree(self,densMap,strmap=None):
@@ -248,7 +248,7 @@ class StructureBlurrer:
             list_points = gridtree.query_ball_point([atom.x,atom.y,atom.z], 1.5*max(sim_sigma_coeff*res_map,1.0))
             return list_points
         else:
-            print "Warning, atom out of map box"
+            print("Warning, atom out of map box")
             return []
     def model_tree(self,list_coord1,distpot=6.0,list_coord2=None):
         """
@@ -478,7 +478,7 @@ class StructureBlurrer:
         densMap = densMap.copy()
         for atom in prot.atomList:
             pos = self.mapGridPosition(densMap, atom)
-            print pos
+            print(pos)
             if pos:
                 densMap.fullMap[pos[2]][pos[1]][pos[0]] += pos[3]
         return densMap
@@ -511,7 +511,7 @@ class StructureBlurrer:
     def make_model_grid(self,prot,spacing,ca_only=False,densMap=False):
         if not densMap:
             densMap = self.protMap(prot, spacing)
-            print "WARNING: Use StructureBlurrer.gaussian_blur_box() to blured a map with a user defined defined cubic box"
+            print("WARNING: Use StructureBlurrer.gaussian_blur_box() to blured a map with a user defined defined cubic box")
             #from here till newMap.fullMap*=0 are few line of code that create an empty map with the new A/px of 1
             #this replace the make_clash_map(apix) function. they do the job but they need to be replaced with something more rigorous
         x_s = int(densMap.x_size()*densMap.apix)
@@ -595,7 +595,7 @@ class StructureBlurrer:
         #Daven always use that so that it blurred based on the experiment box
         if not densMap:
             densMap = self.protMap(prot, min(resolution/4., 3.5), resolution)
-            print "WARNING: Use StructureBlurrer.gaussian_blur_box() to blured a map with a user defined defined cubic box"
+            print("WARNING: Use StructureBlurrer.gaussian_blur_box() to blured a map with a user defined defined cubic box")
             #from here till newMap.fullMap*=0 are few line of code that create an empty map with the new A/px of 1
             #this replace the make_clash_map(apix) function. they do the job but they need to be replaced with something more rigorous
         x_s = int(densMap.x_size()*densMap.apix)
@@ -699,7 +699,7 @@ class StructureBlurrer:
         gridpx=min(resolution/4., 3.5)
         if not densMap:
             densMap = self.protMap(prot, min(resolution/4., 3.5), resolution)
-            print "WARNING: Use StructureBlurrer.hard_sphere() to create a map with a user defined defined cubic box"
+            print("WARNING: Use StructureBlurrer.hard_sphere() to create a map with a user defined defined cubic box")
         x_s = int(densMap.x_size()*densMap.apix)
         y_s = int(densMap.y_size()*densMap.apix)
         z_s = int(densMap.z_size()*densMap.apix)
@@ -708,7 +708,7 @@ class StructureBlurrer:
 
         newMap = self.make_atom_overlay_mapB(newMap, prot)
         #new_map.fullMap = laplace(self.fullMap)
-        print gridpx
+        print(gridpx)
         #newMap.fullMap = uniform_filter(newMap.fullMap,size=gridpx,mode='constant',cval=0.0)
         newMap = newMap.resample_by_box_size(densMap.box_size())
         #newMap.fullMap=newMap
@@ -795,7 +795,7 @@ class StructureBlurrer:
         if not densMap:
             #>
             densMap = self.protMap(prot, max(1.0,min(resolution/4., 3.5)), resolution)
-            print "WARNING: Use StructureBlurrer.gaussian_blur_real_space_box() to blured a map with a user defined defined cubic box"
+            print("WARNING: Use StructureBlurrer.gaussian_blur_real_space_box() to blured a map with a user defined defined cubic box")
         x_s = int(densMap.x_size()*densMap.apix)
         y_s = int(densMap.y_size()*densMap.apix)
         z_s = int(densMap.z_size()*densMap.apix)
@@ -905,7 +905,7 @@ class StructureBlurrer:
                     t2 = time()
                     newMap[z][y][x] = self.bandpass_eq_gaussian(dist, lopass, lopass_min, lowid, hipass, hiwid)
                     t3 = time()
-                    print t2-t1, t3-t2
+                    print(t2-t1, t3-t2)
         return newMap
 
     def _bandpass_eq_gaussian(self, dist, lopass, lopass_min, lowid, hipass, hiwid):
@@ -935,6 +935,6 @@ class StructureBlurrer:
         for x in range(l_len):
             a[x] = self.bandpass_eq_gaussian(x, lopass, lopass_min, lowid, hipass, hiwid)
         end = time()
-        print end-start
+        print(end-start)
         return a
     

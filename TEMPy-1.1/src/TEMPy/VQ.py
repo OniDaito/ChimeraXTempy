@@ -145,7 +145,7 @@ def write_to_pdb(vq, output_file=None):
     elem = 'C'
     charge = ''
     for v in vq:
-	line = ''
+        line = ''
         line += record_name.ljust(6) 
         line += str(serial).rjust(5)+' '
         line += atom_name.center(4)
@@ -168,8 +168,8 @@ def write_to_pdb(vq, output_file=None):
         line += charge.strip().ljust(2)
         line = line + '\n'
         f.write(line)
-	serial += 1
-	res_no += 1
+    serial += 1
+    res_no += 1
     f.close()	
     #atomList = [x.to_atom() for x in vq]
     ##s = Structure(atomList)
@@ -202,7 +202,7 @@ def get_VQ_points(emmap, threshold, noOfPoints, epochs, output_file=None, lap_fi
     #ASK SHIHUA WHAT VALUE TO USE HERE for epochs
     if lap_fil:
         emmap = emmap.laplace_filtered()
-    	emmap = emmap.normalise()
+        emmap = emmap.normalise()
     D = map_points(emmap, threshold)
     vq = VQ(D, noOfPoints, epochs)
     if output_file:

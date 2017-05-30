@@ -69,7 +69,7 @@ class Cluster:
                 outp.write("%s\t%.5f\n" %(i[0],i[2]))
             outp.close()
         else:
-            print 'this is for print!!!'
+            print('this is for print!!!')
 
     def cluster_fit_ensemble_top_fit(self,ensemble_list,score,rms_cutoff,res_target_map,sigma_coeff,number_top_mod=0,write=False,targetMap=False):
         """
@@ -144,10 +144,10 @@ class Cluster:
             end_num = len(list_ordered)
             fit_class = 0
             for ipdb in list_ordered:
-                print "model num %d: %s\n" %(list_ordered.index(ipdb)+1, ipdb[0])
+                print("model num %d: %s\n", list_ordered.index(ipdb)+1, ipdb[0])
                 ini_num1 = list_ordered.index(ipdb)
                 mod1=ipdb[1]
-                print 'next index ' + str(ini_num1)
+                print('next index ' + str(ini_num1))
                 if ipdb[-1] == 0:
                     fit_class+=1
                     for ipdb1 in list_ordered[ini_num1 : end_num]:
@@ -155,10 +155,10 @@ class Cluster:
                         if ipdb1[-1] == 0:
                             rmsd_val=float(mod1.RMSD_from_same_structure(mod2,CA=True))
                             ipdb1[3]=rmsd_val
-                            print "rmsd of %s from best local fit (%s)= %.2f" %(ipdb1[0], ipdb[0], rmsd_val)
+                            print("rmsd of %s from best local fit (%s)= %.2f", ipdb1[0], ipdb[0], rmsd_val)
                             if rmsd_val < rms_cutoff:
                                 ipdb1[-1] = fit_class
-                            print 'class= ' + str(ipdb1[-1])
+                            print('class= ' + str(ipdb1[-1]))
                         else: continue
                 else: continue
             return cluster._print_results_cluster(list_ordered,fit_class,number_top_mod,score,write)
@@ -168,21 +168,21 @@ class Cluster:
             end_num = len(list_ordered[:x])
             fit_class = 0
             for ipdb in list_ordered[:x]:
-                print "model num %d: %s\n" %(list_ordered.index(ipdb)+1, ipdb[0])
+                print("model num %d: %s\n", list_ordered.index(ipdb)+1, ipdb[0])
                 ini_num1 = list_ordered.index(ipdb)
                 mod1=ipdb[1]
-                print 'next index ' + str(ini_num1)
+                print('next index ' + str(ini_num1))
                 if ipdb[-1] == 0:
                     fit_class+=1
                     for ipdb1 in list_ordered[ini_num1 : end_num]:
                         mod2=ipdb1[1]
                         if ipdb1[-1] == 0:
                             rmsd_val=float(mod1.RMSD_from_same_structure(mod2,CA=True))
-                            print "rms of %s from best local fit (%s)= %.2f" %(ipdb1[0], ipdb[0], rmsd_val)
+                            print("rms of %s from best local fit (%s)= %.2f", ipdb1[0], ipdb[0], rmsd_val)
                             ipdb1[3]=rmsd_val
                             if rmsd_val < rms_cutoff:
                                 ipdb1[-1] = fit_class
-                            print 'class= ' + str(ipdb1[-1])
+                            print('class= ' + str(ipdb1[-1]))
                         else: continue
                 else: continue
             return cluster._print_results_cluster(list_ordered[:x],fit_class,number_top_mod,score,write)
@@ -208,7 +208,7 @@ class Cluster:
         mxRMSD = zeros(shape=(len(sorted_rank),len(sorted_rank)))
         for mod1 in sorted_rank:
             for mod2 in sorted_rank:
-                print mod1[0],mod2[0]
+                print(mod1[0],mod2[0])
                 rmsd_val=float(list_rotate_models_dict[mod1[0]].RMSD_from_same_structure(list_rotate_models_dict[mod2[0]],CA=CA))
                 m1=sorted_rank.index(mod1)
                 m2=sorted_rank.index(mod2)
@@ -288,11 +288,11 @@ class Cluster:
         #print targetMap
         if targetMap==False:
             #targetMap = self.protMap(prot, min(resolution/4., 3.5), resolution)
-            print "WARNING:Need target map"
+            print("WARNING:Need target map")
             sys.exit()
         if score not in ['CCC','LAP','MI','NV','NV_Sobel','NV_Laplace','ENV','CD']:
-            print 'Incorrect Scoring Function: %s' % score
-            print 'Please select from one of the following scoring functions: %s' % ', '.join(['CCC','LAP','MI','NV','NV_Sobel','NV_Laplace','ENV','CD'])
+            print('Incorrect Scoring Function: %s', score)
+            print('Please select from one of the following scoring functions: %s', ''.join(['CCC','LAP','MI','NV','NV_Sobel','NV_Laplace','ENV','CD']))
             sys.exit()
         
         
