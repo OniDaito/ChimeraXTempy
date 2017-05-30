@@ -1,4 +1,5 @@
 *.pyc
+*.swp
 build
 chimeraenv
 chimeraxtest.egg-info

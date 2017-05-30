@@ -22,9 +22,9 @@ class _MyAPI(BundleAPI):
     # Not sure where logger is needed or what it does yet
     from . import cmd
     # Not sure the difference between alias and register :/
-    if command_name == "tempy":
+    if command_name == "sccc_score":
       from . import cmd
-      cmd.register_tempy()
+      cmd.register_sccc_score()
 
 
 bundle_api = _MyAPI()
