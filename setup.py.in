@@ -77,16 +77,22 @@ setup(
     python_requires=">= 3.5",
     package_dir={
         "chimerax.tempy": "src",
+        "TEMPy" : "TEMPy",
         # Wonder if we should put TEMPy in here?
     },
     packages=[
         "chimerax.tempy",
+        "TEMPy",
     ],
     ext_modules=ext_mods,
     install_requires=[
         # list dependences on non-standard Python packages incl. ChimeraX ones
+        # Question - should we package TEMPy with this or load externally here?
+        # For now I'm including it as TEMPy isn't in pip
         "ChimeraX-Core",
-        "TEMPy",
+        "numpy",
+        "scipy",
+        "biopython",
     ],
     classifiers=[
         # From https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -101,6 +107,6 @@ setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "ChimeraX :: Bundle :: General :: 1,1 :: chimerax.tempy :: chimerax.test :: ",
         "ChimeraX :: Tool :: Tempy :: General :: Show Tempy",
-        "ChimeraX :: Command :: tempy :: General :: Do something with tempy",
+        "ChimeraX :: Command :: smoc_score :: General :: Calculate the SMOC score with Tempy",
     ] + environments,
 )

@@ -7,21 +7,20 @@ from chimerax.core.commands import CmdDesc, AtomSpecArg
 from chimerax.core.commands import StringArg, BoolArg, FloatArg, IntArg, EnumOf
 
 
-def tempy(session, spec=None, log=None):
-  print("Testing tempy")
+def sccc_score(session, spec=None, log=None):
+  print("Calculate SCCC Score")
   
   
-tempy_desc = CmdDesc(required=[("spec", AtomSpecArg),],
+sccc_score_desc = CmdDesc(required=[("spec", AtomSpecArg),],
                         keyword=[("log", BoolArg)],
                         synopsis="The Tempy Program")
     
-    
-def register_tempy():
+
+# I suspect this refers to the cmd line bit
+def register_sccc_score():
     from chimerax.core.commands import register, CmdDesc, NoArg
     desc = CmdDesc(
         required  = [],
         optional  = [('sim', NoArg),] 
                 )
-    register('tempy', desc, tempy)
-
-
+    register('sccc_score', desc, sccc_score)
