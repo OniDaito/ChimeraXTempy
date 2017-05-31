@@ -12,6 +12,7 @@ from TEMPy.MapParser import MapParser
 from TEMPy.RigidBodyParser import RBParser
 from TEMPy.ScoringFunctions import ScoringFunctions
 from TEMPy.class_arg import TempyParser
+from TEMPy.ProtRep_Biopy import BioPy_Structure,BioPyAtom
 
 from chimerax.core.tools import ToolInstance
 from chimerax.core.models import Models
@@ -53,7 +54,9 @@ class ToolUI(ToolInstance):
     button_file = QPushButton("select rigid file")
     label_file = QLabel("Rigid filename:")
     self._widget_rigid_file = QLineEdit()
-    
+    # TODO - remove this eventually
+    self._widget_rigid_file.setText('/home/oni/Projects/tempy/data/tempy/rigid.txt')
+
     button_file.clicked.connect(self._select_rigid_file)
     layout.addWidget(button_file,1,2)
     layout.addWidget(self._widget_rigid_file,1,1)
@@ -124,10 +127,17 @@ class ToolUI(ToolInstance):
     # read PDB file
     # TODO - we need to change this to current selected PDB Model
     #structure_instance=PDBParser.read_PDB_file('pdbfile',p,hetatm=False,water=False)
-   
+  
+    atomlist = []
+    print(dir(atomic_model))
+    for atom in atomic_model.atoms:
+      atomlist.append(self._chimera_to_tempy_atom(atom, len(atomlist)))
+
+    bio_atom_structure = BioPy_Structure(atomlist)
+
     SCCC_list_structure_instance=[]
     # read rigid body file and generate structure instances for each segment
-    listRB = RBParser.read_FlexEM_RIBFIND_files(rb_file, atomic_model)
+    listRB = RBParser.read_FlexEM_RIBFIND_files(rb_file, bio_atom_structure)
     
     # score each rigid body segment
     listsc_sccc = []
@@ -189,7 +199,58 @@ class ToolUI(ToolInstance):
     #  scf = open(os.path.join(os.path.dirname(os.path.abspath(p)),'sccc_'+pName),'w')
     #  for sc in listsc_sccc: scf.write(str(sc)+"\n")
     #  scf.close()
-      
+  
+  def _chimera_to_tempy_atom(self, atom, serial):
+
+    ta = BioPyAtom([])
+
+    ta.serial = serial
+    ta.atom_name = atom.name
+    ta.alt_loc = "" # TODO - Not sure what to put here 
+    
+    #self.fullid=atom.get_full_id()
+    
+    ta.res = atom.residue.name
+    ta.chain = atom.chain_id
+    ta.res_no = atom.residue.number
+    ta.model = atom.chain_id # PDB number?
+    ta.icode = "" # TODO - Not sure about this
+    #if atom.is_disordered()==1:
+    #    self.icode = "D"
+         # 1 if the residue has disordered atoms
+#            self.icode = pdbString[26].strip()#code for insertion residues
+#             # Starting co-ordinates of atom.
+    ta.init_x = atom.coord[0]
+    ta.init_y = atom.coord[1]
+    ta.init_z = atom.coord[2]
+    
+    ta.x = atom.coord[0]
+    ta.y = atom.coord[1]
+    ta.z = atom.coord[2]
+    
+    ta.occ = atom.occupancy
+    ta.temp_fac = atom.bfactor
+    ta.elem = atom.element.name
+    ta.charge=""  
+    ta.record_name = "HETATM"
+    # TODO not sure about this
+    if atom.in_chain:
+      ta.record_name = "ATOM"
+
+    #Mass of atom as given by atomicMasses global constant. Defaults to 1.
+    ta.mass = atom.element.mass
+    
+    #vdW of an atom
+    #try: self.vdw = vdw_radii[self.atom_name[0]]
+    #except: self.vdw = 1.7
+    #if not self.vdw: self.vdw = 1.7
+    ta.vdw = 1.7
+    ta.isTerm = False
+    #for atoms in a grid box, store grid indices
+    ta.grid_indices = []
+
+    return ta
+
   def _select_rigid_file(self):
     from PyQt5.QtWidgets import QFileDialog
     filename = QFileDialog.getOpenFileName(None, 'OpenFile')
