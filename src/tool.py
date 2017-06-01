@@ -19,9 +19,13 @@ from chimerax.core.models import Models
 
 from chimerax.core.map.volume import Volume
 from chimerax.core.atomic.structure import AtomicStructure
+<<<<<<< HEAD
 
 from .util import chimera_to_tempy_atom, chimera_to_tempy_map
 
+=======
+ 
+>>>>>>> 4595f33e3c95d053a72f0aa73763dc7ed4bb14fa
 import os
 
 class ToolUI(ToolInstance):
@@ -83,7 +87,14 @@ class ToolUI(ToolInstance):
 
   def _sccc_score(self):
     print("Calculating SMOC Score")
+<<<<<<< HEAD
     rez = 10.0 #tp.args.res
+=======
+    m = "filemap"#tp.args.inp_map - current mrc file apparently
+    r = 10.0 #tp.args.res
+    c = "dunno" #tp.args.thr
+    p = "thepdb" #tp.args.pdb - current pdb file
+>>>>>>> 4595f33e3c95d053a72f0aa73763dc7ed4bb14fa
    
     atomic_model = None
     map_model = None
@@ -107,8 +118,12 @@ class ToolUI(ToolInstance):
         map_model = mm
         break
     
+<<<<<<< HEAD
     print(dir(map_model))
     print(map_model.data)
+=======
+
+>>>>>>> 4595f33e3c95d053a72f0aa73763dc7ed4bb14fa
     # the sigma factor determines the width of the Gaussian distribution used to describe each atom
     # TODO - this needs to be a slider or textbox
     sim_sigma_coeff = 0.187
@@ -129,12 +144,20 @@ class ToolUI(ToolInstance):
     #structure_instance=PDBParser.read_PDB_file('pdbfile',p,hetatm=False,water=False)
   
     atomlist = []
+<<<<<<< HEAD
 
     for atom in atomic_model.atoms:
       atomlist.append(chimera_to_tempy_atom(atom, len(atomlist)))
 
     bio_atom_structure = BioPy_Structure(atomlist)
     bio_map_structure = chimera_to_tempy_map(map_model)
+=======
+    print(dir(atomic_model))
+    for atom in atomic_model.atoms:
+      atomlist.append(self._chimera_to_tempy_atom(atom, len(atomlist)))
+
+    bio_atom_structure = BioPy_Structure(atomlist)
+>>>>>>> 4595f33e3c95d053a72f0aa73763dc7ed4bb14fa
 
     SCCC_list_structure_instance=[]
     # read rigid body file and generate structure instances for each segment
@@ -144,6 +167,7 @@ class ToolUI(ToolInstance):
     listsc_sccc = []
     print('calculating scores')
 
+<<<<<<< HEAD
     for RB in listRB:
       # sccc score
       score_SCCC=scorer.SCCC(bio_map_structure, rez, sim_sigma_coeff, bio_atom_structure, RB, c_mode=False)
@@ -151,6 +175,55 @@ class ToolUI(ToolInstance):
       print ('>>', score_SCCC)
       listsc_sccc.append(score_SCCC)
     
+=======
+    return
+
+    for RB in listRB:
+      # sccc score
+      score_SCCC=scorer.SCCC(emmap,r,sim_sigma_coeff,structure_instance,RB,c_mode=False)
+      SCCC_list_structure_instance.append(score_SCCC)
+      print ('>>', score_SCCC)
+      listsc_sccc.append(score_SCCC)
+      
+    listRB=RBParser.RBfileToRBlist(rb_file)
+    if len(listRB) == len(listsc_sccc):
+      #include sccc scores as b-factor records
+      for x in structure_instance.atomList:
+        cur_chain = x.chain
+        cur_res = x.get_res_no()
+        ct = 0
+        flage = 0
+        if cur_chain in ['',' ']: cur_chain = '-'
+        for rb in listRB:
+          for rb1 in rb:
+            if len(rb1) == 2:
+                try: st = int(rb1[0].split(':')[0])
+                except TypeError: st = rb1[0]
+                try: en = int(rb1[1].split(':')[0])
+                except TypeError: en = rb1[1]
+                if ':' in rb1[0]:
+                  ch_rb = rb1[0].split(':')[1]
+                else: ch_rb = '-'
+                #TODO check for insertion codes
+                for i in range(st,en+1):
+                  if int(cur_res) == i and ch_rb == cur_chain: 
+                    flage = 1
+                    break
+                if flage == 1: break
+          if flage == 1: break  
+          ct += 1
+        if flage == 1:
+          sc = listsc_sccc[ct]    
+          try: x.temp_fac = sc
+          except :
+            print('Residue missing: ',cur_res, ch, out_iter_pdb)
+            x.temp_fac = 0.0
+        else:
+          x.temp_fac = 0.0
+      pName = os.path.basename(os.path.abspath(p)).split('.')[0]
+      structure_instance.write_to_PDB(os.path.join(os.path.dirname(p),pName+"_sc.pdb"))  
+
+>>>>>>> 4595f33e3c95d053a72f0aa73763dc7ed4bb14fa
     # generate chimera attribute file for coloring segments based on sccc score
     # Plot.PrintOutChimeraAttributeFileSCCC_Score(p,SCCC_list_structure_instance,listRB)
     # TODO - do this directly
@@ -161,6 +234,59 @@ class ToolUI(ToolInstance):
     #  for sc in listsc_sccc: scf.write(str(sc)+"\n")
     #  scf.close()
   
+<<<<<<< HEAD
+=======
+  def _chimera_to_tempy_atom(self, atom, serial):
+
+    ta = BioPyAtom([])
+
+    ta.serial = serial
+    ta.atom_name = atom.name
+    ta.alt_loc = "" # TODO - Not sure what to put here 
+    
+    #self.fullid=atom.get_full_id()
+    
+    ta.res = atom.residue.name
+    ta.chain = atom.chain_id
+    ta.res_no = atom.residue.number
+    ta.model = atom.chain_id # PDB number?
+    ta.icode = "" # TODO - Not sure about this
+    #if atom.is_disordered()==1:
+    #    self.icode = "D"
+         # 1 if the residue has disordered atoms
+#            self.icode = pdbString[26].strip()#code for insertion residues
+#             # Starting co-ordinates of atom.
+    ta.init_x = atom.coord[0]
+    ta.init_y = atom.coord[1]
+    ta.init_z = atom.coord[2]
+    
+    ta.x = atom.coord[0]
+    ta.y = atom.coord[1]
+    ta.z = atom.coord[2]
+    
+    ta.occ = atom.occupancy
+    ta.temp_fac = atom.bfactor
+    ta.elem = atom.element.name
+    ta.charge=""  
+    ta.record_name = "HETATM"
+    # TODO not sure about this
+    if atom.in_chain:
+      ta.record_name = "ATOM"
+
+    #Mass of atom as given by atomicMasses global constant. Defaults to 1.
+    ta.mass = atom.element.mass
+    
+    #vdW of an atom
+    #try: self.vdw = vdw_radii[self.atom_name[0]]
+    #except: self.vdw = 1.7
+    #if not self.vdw: self.vdw = 1.7
+    ta.vdw = 1.7
+    ta.isTerm = False
+    #for atoms in a grid box, store grid indices
+    ta.grid_indices = []
+
+    return ta
+>>>>>>> 4595f33e3c95d053a72f0aa73763dc7ed4bb14fa
 
   def _select_rigid_file(self):
     from PyQt5.QtWidgets import QFileDialog
