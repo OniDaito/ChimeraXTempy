@@ -24,8 +24,3 @@ def register_sccc_score():
         optional  = [('sim', NoArg),] 
                 )
     register('sccc_score', desc, sccc_score)
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 4595f33e3c95d053a72f0aa73763dc7ed4bb14fa
