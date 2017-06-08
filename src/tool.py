@@ -6,21 +6,11 @@
 # Seems like Tool exists inside the bundle and needs overridding
 
 
-from TEMPy.StructureBlurrer import StructureBlurrer
-from TEMPy.StructureParser import PDBParser
-from TEMPy.MapParser import MapParser
-from TEMPy.RigidBodyParser import RBParser
-from TEMPy.ScoringFunctions import ScoringFunctions
-from TEMPy.class_arg import TempyParser
-from TEMPy.ProtRep_Biopy import BioPy_Structure,BioPyAtom
-
 from chimerax.core.tools import ToolInstance
 from chimerax.core.models import Models
 
 from chimerax.core.map.volume import Volume
 from chimerax.core.atomic.structure import AtomicStructure
-
-from .util import chimera_to_tempy_atom, chimera_to_tempy_map
 
 import os
 
@@ -57,7 +47,7 @@ class ToolUI(ToolInstance):
     label_file = QLabel("Rigid filename:")
     self._widget_rigid_file = QLineEdit()
     # TODO - remove this eventually
-    self._widget_rigid_file.setText('/home/oni/Projects/tempy/data/tempy/rigid.txt')
+    self._widget_rigid_file.setText('/home/oni/Projects/ChimeraXTempy/test/rigid_RF.txt')
 
     button_file.clicked.connect(self._select_rigid_file)
     layout.addWidget(button_file,1,2)
@@ -82,11 +72,7 @@ class ToolUI(ToolInstance):
     #self._remove_handler = t.add_handler(REMOVE_MODELS, self._update_chains)
 
   def _sccc_score(self):
-    print("Calculating SMOC Score")
-    rez = 10.0 #tp.args.res
-  
-    atomic_model = None
-    map_model = None
+    from .sccc import score
 
     # TODO - Proper checks for existance
     rb_file = self._widget_rigid_file.text()
@@ -94,7 +80,6 @@ class ToolUI(ToolInstance):
     # Looking for currently selected maps and similar
     print(self.session.models.list())
   
-   
     # TODO - For now find the first AtomicStructure and first Volume (eventually, do selected and throw errors)
     
     for mm in self.session.models.list():
@@ -106,58 +91,10 @@ class ToolUI(ToolInstance):
       if isinstance(mm, Volume):
         map_model = mm
         break
-    
-    # the sigma factor determines the width of the Gaussian distribution used to describe each atom
-    # TODO - this needs to be a slider or textbox
-    sim_sigma_coeff = 0.187
-
  
-    # TODO - replace this with the current loaded map
-    #emmap = MapParser.readMRC(map_model_filename)
+    score(self.session, atomic_model, map_model, rb_file)
 
-    # make class instances for density simulation (blurring), scoring and plot scores
-    blurrer = StructureBlurrer()
-    scorer = ScoringFunctions()
 
-    # read map file
-    #emmap=MapParser.readMRC(m)
-    
-    # read PDB file
-    # TODO - we need to change this to current selected PDB Model
-    #structure_instance=PDBParser.read_PDB_file('pdbfile',p,hetatm=False,water=False)
-  
-    atomlist = []
-
-    for atom in atomic_model.atoms:
-      atomlist.append(chimera_to_tempy_atom(atom, len(atomlist)))
-
-    bio_atom_structure = BioPy_Structure(atomlist)
-    bio_map_structure = chimera_to_tempy_map(map_model)
-    SCCC_list_structure_instance=[]
-    # read rigid body file and generate structure instances for each segment
-    listRB = RBParser.read_FlexEM_RIBFIND_files(rb_file, bio_atom_structure)
-    
-    # score each rigid body segment
-    listsc_sccc = []
-    print('calculating scores')
-
-    for RB in listRB:
-      # sccc score
-      score_SCCC=scorer.SCCC(bio_map_structure, rez, sim_sigma_coeff, bio_atom_structure, RB, c_mode=False)
-      SCCC_list_structure_instance.append(score_SCCC)
-      print ('>>', score_SCCC)
-      listsc_sccc.append(score_SCCC)
-    
-    # generate chimera attribute file for coloring segments based on sccc score
-    # Plot.PrintOutChimeraAttributeFileSCCC_Score(p,SCCC_list_structure_instance,listRB)
-    # TODO - do this directly
-
-    #if os.path.isfile(os.path.abspath(p)):
-    #  pName = os.path.basename(os.path.abspath(p)).split('.')[0]
-    #  scf = open(os.path.join(os.path.dirname(os.path.abspath(p)),'sccc_'+pName),'w')
-    #  for sc in listsc_sccc: scf.write(str(sc)+"\n")
-    #  scf.close()
-  
   def _select_rigid_file(self):
     from PyQt5.QtWidgets import QFileDialog
     filename = QFileDialog.getOpenFileName(None, 'OpenFile')

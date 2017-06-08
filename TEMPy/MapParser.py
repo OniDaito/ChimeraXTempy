@@ -76,7 +76,7 @@ class MapParser:
         fm_string = endian+(10*'l')+(6*'f')+(3*'l')+(3*'f')+(27*'l')+(3*'f')+(4*'c')+'lfl'
         header = list(binary.unpack(fm_string, f.read(224)))
         notes = f.read(800)
-        notes = string.replace(notes, '\x00', '')
+        notes = notes.replace(b'\x00', b'')
         header.append(notes)
         header = tuple(header)
         f.close()

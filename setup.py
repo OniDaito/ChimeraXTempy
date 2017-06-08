@@ -107,6 +107,6 @@ setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "ChimeraX :: Bundle :: General :: 1,1 :: chimerax.tempy :: chimerax.test :: ",
         "ChimeraX :: Tool :: Tempy :: General :: Show Tempy",
-        "ChimeraX :: Command :: smoc_score :: General :: Calculate the SMOC score with Tempy",
+        "ChimeraX :: Command :: sccc :: General :: Calculate the SCCC with Tempy",
     ] + environments,
 )

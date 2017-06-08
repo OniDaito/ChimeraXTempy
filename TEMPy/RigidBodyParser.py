@@ -45,7 +45,7 @@ class RBParser:
 				
 		
 		"""
-		ssefile = open(file_in, 'rU')
+		ssefile = open(file_in, 'r')
 		nsse = 0
 		RB_structureinstance_tot=[]
 		for line in ssefile:

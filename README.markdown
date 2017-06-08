@@ -15,9 +15,9 @@ Inside the virtualenv setup with ChimeraX
 
     ./build_install.sh
 
-To run, something like
+To load the UI and some test models, use something like
 
-    ./ChimeraX --start Tempy --cmd 'open ~/Projects/tempy/data/tempy/1akeA_10A.mrc; open ~/Projects/tempy/data/tempy/1akeA.pdb'
+    ./ChimeraX --start Tempy --cmd 'open ~/Projects/ChimeraXTempy/test/final1_mdcg.pdb; open ~/Projects/ChimeraXTempy/test/1akeA_10A.mrc;'
 
 ### Bundle to distribute
 
@@ -27,6 +27,17 @@ This is a little easier. Simple execute the following:
 
 This creates a python wheel bundle in the dist directory. You can then use this with ChimeraX to install the plugin.
 
+## How to use this plugin
+
+Inside ChimeraX with the command line, you can compute the sccc with the following command
+
+    sccc (#1) (#2) ~Projects/ChimeraXTempy/test/rigid_RF.txt
+
+Where #1 is the pdb model, #2 is the map.
+
+## Testing
+
+The test directory included contains a python test and some sample model and map files for verifying the scoring functions.
 
 ## Tempy
 
