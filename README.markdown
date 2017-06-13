@@ -7,6 +7,8 @@ Currently at version 0.0.1
 
 ## Building
 
+Currently, this is Linux only, due to the BioPython requirement. One would need to pull in BioPython for Windows or OSX and replace the *Bio* directory included here. 
+
 ### Building and testing for development
 
 Setup a virtualenv environment with the lib/python3.6 directory set to ChimeraX's lib/python3.6 directory. This way, the build_install command can use pip to install the bundle into the right place. Secondly, alter the two paths at the top of the build_install.sh script.
@@ -71,3 +73,9 @@ Authors: Maya Topf, Daven Vasishtan, Arun Prasad Pandurangan, Irene Farabella, A
     Farabella, I., Vasishtan, D., Joseph, A.P., Pandurangan, A.P., Sahota, H. & Topf, M.
     TEMPy: a Python library for assessment of three-dimensional electron microscopy 
     density fits. (2015). J. Appl. Cryst. 48, 1314-1323, link.
+
+### BioPython
+
+All the fine folks who make BioPython.
+
+[https://github.com/biopython/](https://github.com/biopython/)
