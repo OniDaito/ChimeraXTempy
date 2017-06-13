@@ -47,6 +47,7 @@ class TestSCCC(unittest.TestCase):
 
     # read map file
     emmap=MapParser.readMRC(m)
+
     # read PDB file
     structure_instance=PDBParser.read_PDB_file('pdbfile', p, hetatm=False, water=False)
     SCCC_list_structure_instance=[]

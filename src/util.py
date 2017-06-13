@@ -6,14 +6,16 @@
 from TEMPy.ProtRep_Biopy import BioPy_Structure, BioPyAtom
 from TEMPy.EMMap import Map 
 
+atomicMasses = {'H':1, 'C': 12, 'N':14, 'O':16, 'S':32}
+
 def chimera_to_tempy_atom(atom, serial):
-  """ Convert one of the ChimeraX atoms to a Tempy Style one """
+  """ Convert one of the ChimeraX atoms to a Tempy BioPython Style one """
 
   ta = BioPyAtom([])
 
   ta.serial = serial
   ta.atom_name = atom.name
-  ta.alt_loc = "" # TODO - Not sure what to put here 
+  ta.alt_loc = atom.alt_loc # TODO - Not sure what to put here 
 
   ta.res = atom.residue.name
   ta.chain = atom.chain_id
@@ -28,6 +30,7 @@ def chimera_to_tempy_atom(atom, serial):
   ta.init_x = atom.coord[0]
   ta.init_y = atom.coord[1]
   ta.init_z = atom.coord[2]
+  ta.bfactor = atom.bfactor
 
   ta.x = atom.coord[0]
   ta.y = atom.coord[1]
@@ -44,6 +47,7 @@ def chimera_to_tempy_atom(atom, serial):
 
   #Mass of atom as given by atomicMasses global constant. Defaults to 1.
   ta.mass = atom.element.mass
+  ta.mass = atomicMasses.get(ta.atom_name[0])
 
   ta.vdw = 1.7
   ta.isTerm = False
@@ -54,12 +58,15 @@ def chimera_to_tempy_atom(atom, serial):
 def chimera_to_tempy_map(cmap):
   """ Convert a Chimera Map into a tempy one """
   
-  apix = 1.0 # Not sure what tis is
-  origin = cmap.data.origin  
+  apix = 3.0 # TODO - Not sure what this is but will check
+  origin = cmap.data.origin
   
+  # TODO - There is an issue with the origin - need to figure that out
+  origin = (0,0,0)
+
   # Grid_Data is the ChimeraX class we are after here
   # TODO - cmap.matrix *should* return a numpy array which is what we are after I *think*
-  # Don't know if its actually correct
+  # Don't know if its actually correct. In both test and here its all zeros (but has a distinct shape)
   actual_map = cmap.matrix()
   mt = Map(actual_map, origin, apix, "nofilename") 
 

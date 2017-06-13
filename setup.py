@@ -71,28 +71,34 @@ setup(
     version="0.0.1",  # PEP 440, should match Development Status below
     description="The Tempy plugin for ChimeraX",  # one line synopsis
     long_description=description,  # see above
-    author="Birkbeck",
+    author="Birkbeck College University of London",
     author_email="oni@section9.co.uk",
     url="http://tempy.ismb.lon.ac.uk/",
     python_requires=">= 3.5",
     package_dir={
         "chimerax.tempy": "src",
         "TEMPy" : "TEMPy",
-        # Wonder if we should put TEMPy in here?
+        "Bio" : "Bio",
     },
     packages=[
         "chimerax.tempy",
         "TEMPy",
+        "Bio",
     ],
     ext_modules=ext_mods,
     install_requires=[
         # list dependences on non-standard Python packages incl. ChimeraX ones
         # Question - should we package TEMPy with this or load externally here?
         # For now I'm including it as TEMPy isn't in pip
+        # The same goes for biopython as this doesnt appear in the toolshed :/
         "ChimeraX-Core",
-        "numpy",
-        "scipy",
-        "biopython",
+        
+        # So while we do need all these, numpy and scipy are already included
+        # with ChimeraX and biopython is part of our source.
+        
+        #"numpy",
+        #"scipy",
+        #"biopython",
     ],
     classifiers=[
         # From https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -106,7 +112,7 @@ setup(
         "Topic :: Scientific/Engineering :: Chemistry",
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "ChimeraX :: Bundle :: General :: 1,1 :: chimerax.tempy :: chimerax.test :: ",
-        "ChimeraX :: Tool :: Tempy :: General :: Show Tempy",
+        "ChimeraX :: Tool :: Tempy :: General :: Show the Tempy options",
         "ChimeraX :: Command :: sccc :: General :: Calculate the SCCC with Tempy",
     ] + environments,
 )

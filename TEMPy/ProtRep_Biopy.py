@@ -485,7 +485,6 @@ class BioPy_Structure:
         #Centre of mass calculations
         self.CoM = self.calculate_centre_of_mass()
         ##self.initCoM = self.CoM.copy()
-
     
     def __getitem__(self, index):
         return self.atomList[index]
