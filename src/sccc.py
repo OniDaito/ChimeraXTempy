@@ -14,7 +14,9 @@ from TEMPy.ProtRep_Biopy import BioPy_Structure,BioPyAtom
 
 from .util import chimera_to_tempy_atom, chimera_to_tempy_map
 
-def score(session, atomic_model, map_model, rigid_filename):
+import math
+
+def score(session, atomic_model, map_model, rigid_filename, colour_atoms=True):
     print("Calculating SCCC Score")
     rez = 10.0
 
@@ -52,20 +54,30 @@ def score(session, atomic_model, map_model, rigid_filename):
     listsc_sccc = []
     print('calculating scores')
 
+    print(dir(atomic_model))
+
     for RB in listRB:
       # sccc score
+
       score_SCCC=scorer.SCCC(bio_map_structure, rez, sim_sigma_coeff, bio_atom_structure, RB, c_mode=False)
       SCCC_list_structure_instance.append(score_SCCC)
       print ('>>', score_SCCC)
       listsc_sccc.append(score_SCCC)
-    
-    # generate chimera attribute file for coloring segments based on sccc score
-    # Plot.PrintOutChimeraAttributeFileSCCC_Score(p,SCCC_list_structure_instance,listRB)
-    # TODO - do this directly
+      
+      # Colour the atoms based on the rating from white (1.0) to red (0.0)
+      # TODO - maybe a faster way? Also 'all_atoms' mentioned in the API doesnt exist but atoms does! :S
+      # TODO - how do we colour the ribbons as well?
+      if colour_atoms:
+       
+        dd = int(math.floor(256 * score_SCCC))
+        
+        residues = []
+        for a in RB.atomList:
+          if a.res_no not in residues:
+            residues.append(a.res_no)
 
-    #if os.path.isfile(os.path.abspath(p)):
-    #  pName = os.path.basename(os.path.abspath(p)).split('.')[0]
-    #  scf = open(os.path.join(os.path.dirname(os.path.abspath(p)),'sccc_'+pName),'w')
-    #  for sc in listsc_sccc: scf.write(str(sc)+"\n")
-    #  scf.close()
-
+        for r in residues:
+          cr = atomic_model.residues[r]
+          for catm in cr.atoms:
+            catm.color = [255,dd,dd,255] 
+          cr.ribbon_color = [255,dd,dd,255]

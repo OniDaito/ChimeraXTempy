@@ -39,7 +39,7 @@ ifeq ($(OS),Darwin)
 CHIMERAX_APP = /usr/local/src/chimerax/ChimeraX.app
 endif
 ifeq ($(OS),Linux)
-CHIMERAX_APP = /home/oni/Projects/chimerax
+CHIMERAX_APP = /opt/UCSF/chimerax
 endif
 	
 # ==================================================================
