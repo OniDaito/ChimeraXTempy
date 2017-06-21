@@ -526,7 +526,7 @@ class Map:
         fp = self._grid_footprint()
         binmap = self.fullMap > float(c)
         label_array, labels = measurements.label(self.fullMap*binmap,structure=fp)
-        sizes = measurements.sum(binmap, label_array, range(labels + 1))
+        sizes = measurements.sum(binmap, label_array, list(range(labels + 1)))
         if labels < 10:
             m_array = sizes < 0.05*sizes.max()
             ct_remove = numsum(m_array)
@@ -534,7 +534,7 @@ class Map:
             label_array[remove_points] = 0
             return (label_array>0)*(self.fullMap*binmap), labels-ct_remove+1
 
-        means = measurements.mean(self.fullMap*binmap, label_array, range(1,labels + 1))
+        means = measurements.mean(self.fullMap*binmap, label_array, list(range(1,labels + 1)))
         freq,bins = histogram(sizes[1:],20)
 
         m_array = zeros(len(sizes))
@@ -2187,16 +2187,16 @@ class Map:
             l_ind = all_dens.index(low)
             low = all_dens[l_ind+1]
         if high-low < 0.0000002 or high < low:
-            est_weight = long(numsum(new_map.fullMap > low)*new_map.apix**3/(vol_factor*1000))
+            est_weight = int(numsum(new_map.fullMap > low)*new_map.apix**3/(vol_factor*1000))
             print('Exact molecular weight cannot be found. Approx. weight of '+str(est_weight)+' used instead.') 
             
             return low
         thr = low+(high-low)/2
-        this_weight = long(numsum(new_map.fullMap > thr)*new_map.apix**3/(vol_factor*1000))
+        this_weight = int(numsum(new_map.fullMap > thr)*new_map.apix**3/(vol_factor*1000))
         #print "this_weight",this_weight, thr
         #this_weight = long((self.fullMap > thr).sum()*self.apix**3/1210)
         #print thr, this_weight, this_weight.sum()
-        if this_weight == long(molWeight):
+        if this_weight == int(molWeight):
             return thr
         elif this_weight > molWeight:
             return new_map.get_primary_boundary(molWeight, thr, high)

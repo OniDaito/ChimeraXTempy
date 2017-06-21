@@ -180,7 +180,7 @@ class Vector:
         Return:
             Atom instance
         """
-        from ProtRep_Biopy import BioPyAtom
+        from .ProtRep_Biopy import BioPyAtom
         template = 'ATOM      1  C   NOR A   1      23.161  39.732 -25.038  1.00 10.00             C'
         a = BioPyAtom(template)
         a.x = self.x

@@ -51,7 +51,7 @@ class mmCIFParser:
         Return:
             Structure Instance
         """
-        from Bio.PDB import MMCIFParser as MMCIFParserBiopy
+        from .Bio.PDB import MMCIFParser as MMCIFParserBiopy
         p=MMCIFParserBiopy()#permissive default True
         structure=p.get_structure(structure_id, filename)
         return mmCIFParser._biommCIF_strcuture_to_TEMpy(filename,structure,hetatm,water)
@@ -81,7 +81,7 @@ class mmCIFParser:
         
         p=MMCIFParserBiopy()
         url = 'http://www.rcsb.org/pdb/files/%s.cif' % structure_id
-        urllib.urlretrieve(url, filename)
+        urllib.request.urlretrieve(url, filename)
         structure=p.get_structure(structure_id, filename)
         return mmCIFParser._biommCIF_strcuture_to_TEMpy(filename,structure,hetatm,water)
 
@@ -221,7 +221,7 @@ class PDBParser:
  
         url = 'http://www.rcsb.org/pdb/files/%s.pdb' % structure_id
         p=PDBParserBiopy(QUIET=True)#permissive default True
-        urllib.urlretrieve(url, filename)
+        urllib.request.urlretrieve(url, filename)
         structure=p.get_structure(structure_id, filename)
         return PDBParser._bio_strcuture_to_TEMpy(filename,structure,hetatm,water)
         
@@ -249,7 +249,7 @@ class PDBParser:
  
         url = 'http://www.rcsb.org/pdb/files/%s.pdb' % structure_id
         p=PDBParserBiopy(QUIET=True)#permissive default True
-        urllib.urlretrieve(url, filename)
+        urllib.request.urlretrieve(url, filename)
         structure=p.get_structure(structure_id, filename,hetatm=hetatm,water=water)
         return structure
 

@@ -1575,7 +1575,7 @@ class ScoringFunctions:
         box_size = map_target.box_size()
         nz,ny,nx = map_target.fullMap.shape
         zg,yg,xg = mgrid[0:nz,0:ny,0:nx]
-        indi = zip(xg.ravel(), yg.ravel(), zg.ravel())
+        indi = list(zip(xg.ravel(), yg.ravel(), zg.ravel()))
 
         #save rigid body details
         dict_rf_res = {}
@@ -1732,7 +1732,7 @@ class ScoringFunctions:
         box_size = map_target.box_size()
         nz,ny,nx = map_target.fullMap.shape
         zg,yg,xg = mgrid[0:nz,0:ny,0:nx]
-        indi = zip(xg.ravel(), yg.ravel(), zg.ravel())
+        indi = list(zip(xg.ravel(), yg.ravel(), zg.ravel()))
 
         #save rigid body details
         dict_rf_res = {}
@@ -2134,7 +2134,7 @@ class ScoringFunctions:
     def get_sm_score(self, struct, ncomp, template_grid, cvol, apix):
         overlay_maplist = []
         overlay_maplist = self.get_overlay_comp_maplist(struct,template_grid)
-        nc = range(ncomp)
+        nc = list(range(ncomp))
         cpair = list(itertools.combinations(nc,2))
         score = 0.0
         n_overlap_voxel = 0

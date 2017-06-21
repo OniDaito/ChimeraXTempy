@@ -362,13 +362,13 @@ class GA():
       max_change = moffset
 						
 		#GA run loop
-    for grun in xrange(runs):
+    for grun in range(runs):
       # Get the ga_pool
       pop = self.get_ga_pool(assembly, pop_size, max_change, vq_vec_list, quat_vec)
       curr_pop = self.score_population(pop, pop_size, gof, w_gof, w_clash, cpu_avil, jobserver, scorer, assembly, emmap, ncomp, cvol, template_grid, apix)
 
       # Start iterations
-      for x in xrange(no_of_gen):
+      for x in range(no_of_gen):
         f = file(logfile+'.log', 'a')
         #Mutation rate linearly decreasing from 0.2 to 0.02
         mutRate = mrate+(1-x/float(no_of_gen))*0.08
@@ -521,7 +521,7 @@ class GA():
 
     for i in range(0,pop_size1):
       subcomplex_list = []
-      rlist = sample(range(n_vq),nsubunit)
+      rlist = sample(list(range(n_vq)),nsubunit)
       rand_subunit_indx = randint(0,nsubunit)
       for j in range(0,nsubunit):
         offset = vq_vec_list[rlist[j]] - assembly.structList[j].CoM
@@ -539,7 +539,7 @@ class GA():
     trans = max_trans
     for i in range(0,pop_size2):
       subcomplex_list = []
-      rlist = sample(range(n_vq),nsubunit)
+      rlist = sample(list(range(n_vq)),nsubunit)
       rand_subunit_indx = randint(0,nsubunit)
       for j in range(0,nsubunit):
         offset = vq_vec_list[rlist[j]] - assembly.structList[j].CoM
@@ -567,7 +567,7 @@ class GA():
     g_type_ri.append('quaternion')
     g_type_ri.append([1,5000])
 
-    for x in sample(range(len(complex_list)),pop_size):
+    for x in sample(list(range(len(complex_list))),pop_size):
       assembly_gene = complex_list[x]
       geno = []
       trans = []
@@ -1447,7 +1447,7 @@ class Selection:
 
     def breed_mutant(self, mutRate, minmut, maxmut):
       pop_size = len(self.pop)
-      indx = sample(range(pop_size),1)[0]
+      indx = sample(list(range(pop_size)),1)[0]
       sel = self.pop[indx]
       mutant = sel.breed_mutant(mutRate, minmut, maxmut)
       return mutant

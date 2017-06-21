@@ -265,8 +265,8 @@ class MapParser:
         f = open(self.filename, 'r')
         first_line = f.readline().split()
         apix = float(first_line[0])
-        origin = map(float, first_line[1:4])
-        box_size = map(int, first_line[4:7])
+        origin = list(map(float, first_line[1:4]))
+        box_size = list(map(int, first_line[4:7]))
         new_map = []
         line = 1
         while(True):

@@ -107,9 +107,8 @@ class Plot:
             ind = hier.fcluster(linkageMatrixZ, rms_cutoff, 'distance')
             ind=ind.ravel()
             ind=ind[index,]
-            print(zip(mxscore.ravel().tolist(),cluster_dendro,ind))
-            return zip(mxscore.ravel().tolist(),cluster_dendro,ind)
-
+            print(list(zip(mxscore.ravel().tolist(),cluster_dendro,ind)))
+            return list(zip(mxscore.ravel().tolist(),cluster_dendro,ind))
     def ShowRMSDmatrix(self,mxRMSD,name='RMSDmatrix',save=False):
         """
           

@@ -1405,10 +1405,10 @@ REMARK    MODEL GENERATE WITH TEMPY
             seq_list_resno=[]
             seq_str_aa=[]
             for x in chain.atomList:
-                if x.res in aa.keys():
+                if x.res in list(aa.keys()):
                     if x.res_no not in seq_list_resno: 
                         seq_list_resno.append(x.res_no)
-                        if x.res not in aa.keys():
+                        if x.res not in list(aa.keys()):
                             seq_string+="x"
                         res_singleletter=aa[x.res]
                         seq_string+="%s"%res_singleletter

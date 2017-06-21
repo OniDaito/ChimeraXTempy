@@ -206,7 +206,7 @@ class StructureBlurrer:
         zg = zg*apix + origin[2] + apix/2.0
         yg = yg*apix + origin[1] + apix/2.0
         xg = xg*apix + origin[0] + apix/2.0
-        indi = zip(xg.ravel(), yg.ravel(), zg.ravel())
+        indi = list(zip(xg.ravel(), yg.ravel(), zg.ravel()))
         try: 
             from scipy.spatial import cKDTree
             gridtree = cKDTree(indi)
@@ -520,7 +520,7 @@ class StructureBlurrer:
         #get flat indices of grid
         nz,ny,nx = densMap.fullMap.shape
         zg,yg,xg = mgrid[0:nz,0:ny,0:nx]
-        indi = zip(xg.ravel(), yg.ravel(), zg.ravel())
+        indi = list(zip(xg.ravel(), yg.ravel(), zg.ravel()))
         gridtree = self.maptree(densMap)
         
         currentChain = prot.atomList[0].chain

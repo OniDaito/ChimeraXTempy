@@ -61,16 +61,24 @@ def score(session, atomic_model, map_model, rigid_filename, colour_atoms=True):
 
       score_SCCC=scorer.SCCC(bio_map_structure, rez, sim_sigma_coeff, bio_atom_structure, RB, c_mode=False)
       SCCC_list_structure_instance.append(score_SCCC)
+
       print ('>>', score_SCCC)
       listsc_sccc.append(score_SCCC)
       
       # Colour the atoms based on the rating from white (1.0) to red (0.0)
       # TODO - maybe a faster way? Also 'all_atoms' mentioned in the API doesnt exist but atoms does! :S
-      # TODO - how do we colour the ribbons as well?
       if colour_atoms:
-       
-        dd = int(math.floor(256 * score_SCCC))
-        
+        dr = 255
+        dg = 255
+        db = 255
+        if score_SCCC >= 0.5:
+          dr = 255 - int(math.floor(255 * ((score_SCCC - 0.5) * 2.0) ))
+          dg = dr
+        else:
+          db = int(math.floor(255 * (score_SCCC * 2.0)))
+          dg = db
+ 
+
         residues = []
         for a in RB.atomList:
           if a.res_no not in residues:
@@ -79,5 +87,5 @@ def score(session, atomic_model, map_model, rigid_filename, colour_atoms=True):
         for r in residues:
           cr = atomic_model.residues[r]
           for catm in cr.atoms:
-            catm.color = [255,dd,dd,255] 
-          cr.ribbon_color = [255,dd,dd,255]
+            catm.color = [dr,dg,db,255] 
+          cr.ribbon_color = [dr,dg,db,255]
