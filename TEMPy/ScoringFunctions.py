@@ -1634,7 +1634,7 @@ class ScoringFunctions:
             dict_res_scores = {}
             dict_res_indices = dict_chain_indices[ch]    
             for res in dict_res_indices:
-                if not dict_res_scores.has_key(res):
+                if not res in dict_res_scores.keys():
                     indices = dict_res_indices[res][:]
                     #consider residues on both sides. NOTE: wont work for insertion codes!
                     #need to rewite res numbers to avoid insertion codes
@@ -1785,7 +1785,7 @@ class ScoringFunctions:
             inp.close()
         #for residues not in rigid bodies: consider pentapeptides    
         for res in dict_res_indices:
-            if not dict_res_scores.has_key(res):
+            if not res in dict_res_scores.keys():
                 indices = dict_res_indices[res][:]
                 #consider residues on both sides. NOTE: wont work for insertion codes!
                 #need to rewite res numbers to avoid insertion codes

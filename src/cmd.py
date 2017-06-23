@@ -22,7 +22,26 @@ sccc_desc = CmdDesc(required=[("scoringModel", ModelArg),
                       synopsis="The Tempy SCCC function")
     
 
-# I suspect this refers to the cmd line bit
 def register_sccc():
     from chimerax.core.commands import register
     register('sccc', sccc_desc, sccc)
+
+
+def smoc(session, scoringModel=None, scoringMap=None, rigidFile="rigid.txt"):
+  ''' Calculate the smoc score using the parameters above from the command line
+  interface. e.g smoc (#1) (#2) rigid.txt '''
+  
+  from .smoc import score
+  score(session, scoringModel, scoringMap, rigidFile)
+
+  
+smoc_desc = CmdDesc(required=[("scoringModel", ModelArg), 
+                          ("scoringMap", ModelArg),
+                          ("rigidFile", FileNameArg),],
+                      keyword=[("log", BoolArg)],
+                      synopsis="The Tempy SMOC function")
+    
+
+def register_smoc():
+    from chimerax.core.commands import register
+    register('smoc', smoc_desc, smoc)

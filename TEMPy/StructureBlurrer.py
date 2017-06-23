@@ -307,7 +307,7 @@ class StructureBlurrer:
                 dict_res_CA[cur_res] = [x.x, x.y, x.z]
             try: dict_res_indices[cur_res].append([x.x, x.y, x.z])
             except KeyError: dict_res_indices[cur_res] = [[x.x, x.y, x.z]]
-        if not dict_chain_indices.has_key(currentChain):
+        if not currentChain in dict_chain_indices.keys():
             #
             try: dict_chain_CA[x.model][currentChain] = dict_res_CA.copy()
             except KeyError:
@@ -372,10 +372,10 @@ class StructureBlurrer:
                 #CA coordinates
                 dict_res_dist[cur_res] = [x.x, x.y, x.z]
             # get points occupied by the residue
-            if dict_res_indices.has_key(cur_res):
+            if cur_res in dict_res_indices.keys():
                 dict_res_indices[cur_res].extend(points)
             else: dict_res_indices[cur_res] = points
-        if not dict_chain_indices.has_key(currentChain):
+        if not currentChain in dict_chain_indices.keys():
             #uniquify lists
             for el in dict_res_indices:
                 tmplist = dict_res_indices[el][:]
@@ -424,7 +424,7 @@ class StructureBlurrer:
             if x.atom_name == 'CA': #x.fullid
                 #CA coordinates
                 dict_res_dist[cur_res] = [x.x, x.y, x.z]
-            if dict_res_indices.has_key(int(cur_res)):
+            if int(cur_res) in dict_res_indices.keys():
                 dict_res_indices[int(cur_res)].extend(points)
             else: dict_res_indices[int(cur_res)] = points
         #uniquify lists

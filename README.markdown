@@ -33,9 +33,11 @@ This creates a python wheel bundle in the dist directory. You can then use this 
 
 Inside ChimeraX with the command line, you can compute the sccc with the following command
 
-    sccc (#1) (#2) ~Projects/ChimeraXTempy/test/rigid_RF.txt
+    sccc (#1) (#2) ~/Projects/ChimeraXTempy/test/rigid_RF.txt
 
-Where #1 is the pdb model, #2 is the map.
+Where #1 is the pdb model, #2 is the map. The SMOC is the same:
+
+    smoc (#1) (#2) ~/Projects/ChimeraXTempy/test/rigid_RF.txt
 
 ## Testing
 

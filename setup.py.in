@@ -114,5 +114,6 @@ setup(
         "ChimeraX :: Bundle :: General :: 1,1 :: chimerax.tempy :: chimerax.test :: ",
         "ChimeraX :: Tool :: Tempy :: General :: Show the Tempy options",
         "ChimeraX :: Command :: sccc :: General :: Calculate the SCCC with Tempy",
+        "ChimeraX :: Command :: smoc :: General :: Calculate the SMOC with Tempy",
     ] + environments,
 )
