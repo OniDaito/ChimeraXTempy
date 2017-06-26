@@ -52,9 +52,7 @@ def score(session, atomic_model, map_model, rigid_filename, colour_atoms=True):
     
     # score each rigid body segment
     listsc_sccc = []
-    print('calculating scores')
-
-    print(dir(atomic_model))
+    print('calculating SCCC')
 
     for RB in listRB:
       # sccc score
