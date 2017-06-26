@@ -5,7 +5,6 @@
 #
 # Seems like Tool exists inside the bundle and needs overridding
 
-
 from chimerax.core.tools import ToolInstance
 from chimerax.core.models import Models
 
@@ -32,66 +31,52 @@ class ToolUI(ToolInstance):
     self.tool_window.manage(placement="side")
     parent = self.tool_window.ui_area
 
-    # UI consists of a chain selector and search button on top
-    # and HTML widget below for displaying results.
-    # Layout all the widgets
-    from PyQt5.QtWidgets import QLineEdit, QGridLayout, QLabel, QComboBox, QPushButton
+    # All the PyQT5 Layout business
+    from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QComboBox, QPushButton
     from chimerax.core.ui.widgets import HtmlView
     
-    layout = QGridLayout()
+    layout = QVBoxLayout()
     self.top_layout = layout
     layout.setContentsMargins(0, 0, 0, 0)
+
+    # Score layouts
+    button_layout = QHBoxLayout()
+    layout.addLayout(button_layout)
+
     # Scoring 
-    label = QLabel("SCCC Score:")
-    layout.addWidget(label, 0, 0)
-    button = QPushButton("calculate")
-    button.clicked.connect(self._sccc_score)
-    layout.addWidget(button, 0, 2)
-    
+    button_sccc = QPushButton("SCCC")
+    button_sccc.clicked.connect(self._sccc_score)
+    button_layout.addWidget(button_sccc)
+   
+    button_smoc = QPushButton("SMOC")
+    button_smoc.clicked.connect(self._smoc_score)
+    button_layout.addWidget(button_smoc)
+     
     # Rigid file
-    button_file = QPushButton("select rigid file")
-    label_file = QLabel("Rigid filename:")
+    rigid_layout = QHBoxLayout()
+    layout.addLayout(rigid_layout)
+
+    button_file = QPushButton("Rigid file")
     self._widget_rigid_file = QLineEdit()
+
     # TODO - remove this eventually
     self._widget_rigid_file.setText('/home/oni/Projects/ChimeraXTempy/test/rigid_RF.txt')
 
     button_file.clicked.connect(self._select_rigid_file)
-    layout.addWidget(button_file,1,2)
-    layout.addWidget(self._widget_rigid_file,1,1)
-    layout.addWidget(label_file,1,0)
+    rigid_layout.addWidget(button_file)
+    rigid_layout.addWidget(self._widget_rigid_file)
 
-    label_smoc = QLabel("SMOC Score:")
-    layout.addWidget(label_smoc, 2, 0)
-    button_smoc = QPushButton("calculate")
-    button_smoc.clicked.connect(self._smoc_score)
-    layout.addWidget(button_smoc, 2, 2)
-    
-    #self.results_view = HtmlView(parent, size_hint=(575, 300),
-    #                             interceptor=self._html_view,
-    #                             schemes=[])
-    #layout.addWidget(self.results_view, 1, 0, 1, 3)
-    layout.setColumnStretch(0, 0)
-    layout.setColumnStretch(1, 10)
-    layout.setColumnStretch(2, 0)
-    layout.setRowStretch(0, 0)
-    layout.setRowStretch(1, 10)
     parent.setLayout(layout)
 
-    # Register for model addition/removal so we can update chain list
-    #from chimerax.core.models import ADD_MODELS, REMOVE_MODELS
-    #t = session.triggers
-    #self._add_handler = t.add_handler(ADD_MODELS, self._update_chains)
-    #self._remove_handler = t.add_handler(REMOVE_MODELS, self._update_chains)
-
   def _sccc_score(self):
+    ''' Run the sccc score as a graphical function, 
+    setting the colours of the chosen model.'''
+
     from .sccc import score
 
     # TODO - Proper checks for existance
     rb_file = self._widget_rigid_file.text()
    
-    # Looking for currently selected maps and similar
-    print(self.session.models.list())
-  
     # TODO - For now find the first AtomicStructure and first Volume (eventually, do selected and throw errors)
     
     for mm in self.session.models.list():
@@ -107,42 +92,62 @@ class ToolUI(ToolInstance):
     score(self.session, atomic_model, map_model, rb_file)
 
   def _smoc_score(self):
+    ''' Compute the smoc score but also plot
+    the scores below the tool.'''
 
+    from .smoc import score
     from PyQt5.QtWidgets import QVBoxLayout
+
+    # TODO - Proper checks for existence
+    rb_file = self._widget_rigid_file.text()
+  
+    # TODO - For now find the first AtomicStructure and first Volume (eventually, do selected and throw errors)
+    
+    for mm in self.session.models.list():
+      if isinstance(mm, AtomicStructure):
+        atomic_model = mm
+        break
+    
+    for mm in self.session.models.list():
+      if isinstance(mm, Volume):
+        map_model = mm
+        break
+
+    dict_chains_scores, dict_reslist = score(self.session, atomic_model, map_model, rb_file)
+
     # a figure instance to plot on
     figure = plt.figure()
-
-    # this is the Canvas Widget that displays the `figure`
-    # it takes the `figure` instance as a parameter to __init__
     canvas = FigureCanvas(figure)
-
     parent = self.tool_window.ui_area
-    # this is the Navigation widget
-    # it takes the Canvas widget and a parent
     toolbar = NavigationToolbar(canvas, parent)
-    
-    # set the layout
+     
+    # TODO - This adds a lot more layers if we keep scoring. A good idea to show improvement
+    # perhaps but we may need a way to remove graphs
     sublayout = QVBoxLayout()
     sublayout.addWidget(toolbar)
     sublayout.addWidget(canvas)
     
-    self.top_layout.addLayout(sublayout,3,0)
-    self.top_layout.setColumnStretch(3, 10)
-
-    import random
-    ''' plot some random stuff '''
-    # random data
-    data = [random.random() for i in range(10)]
-
-    # create an axis
-    ax = figure.add_subplot(111)
-
-    # discards the old graph
-    ax.hold(False)
-
-    # plot data
-    ax.plot(data, '*-')
-
+    self.top_layout.addLayout(sublayout)
+  
+    # TODO - Really there is only one ch (as one model) for now but eventually there will be more  
+    # TODO - multiple models for this score eventually
+  
+    for ch in dict_chains_scores:
+      axes =figure.gca()
+      axes.set_ylim([0.4,1.0])
+      figure.xlabel = 'Residue_num'
+      figure.ylabel = 'SMOC'
+      reslist = []
+      scorelist = []
+      
+      for res in dict_reslist[ch]:
+        reslist.append(res)
+        scorelist.append(dict_chains_scores[ch][res])
+     
+      ax = figure.add_subplot(111)
+      ax.hold(False)
+      ax.plot(reslist,scorelist,linewidth=3.0,label="smoc score")
+    
     # refresh canvas
     canvas.draw()
 
