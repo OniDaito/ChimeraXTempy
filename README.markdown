@@ -3,15 +3,27 @@
 Welcome to the ChimeraXTempy bundle plugin. This project combines tempy with ChimeraX for scoring EM fitting.
 
 ## History & Version
-Currently at version 0.0.1
+Currently at version 0.0.2
 
 ## Building
 
-Currently, this is Linux only, due to the BioPython requirement. One would need to pull in BioPython for Windows or OSX and replace the *Bio* directory included here. 
+This plugin for ChimeraX is pure-python though it does install BioPython as part of the setup.
 
 ### Building and testing for development
 
-Setup a virtualenv environment with the lib/python3.6 directory set to ChimeraX's lib/python3.6 directory. This way, the build_install command can use pip to install the bundle into the right place. Secondly, alter the two paths at the top of the build_install.sh script.
+#### ChimeraX approach
+
+This is the accepted approach starting from 0.0.2. With ChimeraX setup, change the paths in the Makefile to the location of your chimera install. With that in place, you can execute the following:
+
+    make install
+
+It should run fine, downloading biopython and installing automatically. You can then run:
+
+    ./ChimeraX --start Tempy --cmd 'open ~/Projects/ChimeraXTempy/test/final1_mdcg.pdb; open ~/Projects/ChimeraXTempy/test/1akeA_10A.mrc;'
+
+#### Virtualenv approach
+
+Deprecated in light of the above! Setup a virtualenv environment with the lib/python3.6 directory set to ChimeraX's lib/python3.6 directory. This way, the build_install command can use pip to install the bundle into the right place. Secondly, alter the two paths at the top of the build_install.sh script.
 
 Inside the virtualenv setup with ChimeraX
 
@@ -25,7 +37,7 @@ To load the UI and some test models, use something like
 
 This is a little easier. Simple execute the following:
 
-    make
+    make wheel
 
 This creates a python wheel bundle in the dist directory. You can then use this with ChimeraX to install the plugin.
 

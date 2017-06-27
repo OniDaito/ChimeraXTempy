@@ -51,14 +51,38 @@ class ToolUI(ToolInstance):
     button_smoc = QPushButton("SMOC")
     button_smoc.clicked.connect(self._smoc_score)
     button_layout.addWidget(button_smoc)
-     
+  
+    # Options for the two scores
+
+    options_layout = QHBoxLayout()
+    layout.addLayout(options_layout)
+
+    label_rez = QLabel("Res.")
+    label_sigma = QLabel("Sigma")
+    label_window = QLabel("Window")
+
+    self._widget_sigma = QLineEdit()
+    self._widget_rez = QLineEdit()
+    self._widget_window = QLineEdit()
+
+    options_layout.addWidget(label_rez)
+    options_layout.addWidget(self._widget_rez)
+    options_layout.addWidget(label_sigma)
+    options_layout.addWidget(self._widget_sigma)
+    options_layout.addWidget(label_window)
+    options_layout.addWidget(self._widget_window)
+
+    self._widget_rez.setText("10.0")
+    self._widget_sigma.setText("0.187")
+    self._widget_window.setText("9")
+
     # Rigid file
     rigid_layout = QHBoxLayout()
     layout.addLayout(rigid_layout)
 
     button_file = QPushButton("Rigid file")
     self._widget_rigid_file = QLineEdit()
-
+    
     # TODO - remove this eventually
     self._widget_rigid_file.setText('/home/oni/Projects/ChimeraXTempy/test/rigid_RF.txt')
 
@@ -68,28 +92,60 @@ class ToolUI(ToolInstance):
 
     parent.setLayout(layout)
 
+    # Figures for SMOC
+    self._figure = None
+    self._canvas = None
+
+  def _select_model_map(self):
+    ''' Our way of selecting the model and map for scoring.
+    We take the first model we find and the first map we 
+    find that are selected. Probably needs improvement.'''
+
+    atomic_model = None
+    map_model = None
+
+    for mm in self.session.models.list():
+      if isinstance(mm, AtomicStructure):
+        # TODO - selected doesnt seem to work too well :/
+        #if mm.selected:
+        atomic_model = mm
+        break
+    
+    for mm in self.session.models.list():
+      if isinstance(mm, Volume):
+        if mm.selected:
+          map_model = mm
+          break
+ 
+    if atomic_model == None or map_model == None:
+      print("TEMPY Error: Please select one model and one map.")
+      return (False, None, None)
+    
+    return (True, atomic_model, map_model)
+
   def _sccc_score(self):
     ''' Run the sccc score as a graphical function, 
     setting the colours of the chosen model.'''
 
     from .sccc import score
 
-    # TODO - Proper checks for existance
+    # Check rigid score file
     rb_file = self._widget_rigid_file.text()
-   
-    # TODO - For now find the first AtomicStructure and first Volume (eventually, do selected and throw errors)
-    
-    for mm in self.session.models.list():
-      if isinstance(mm, AtomicStructure):
-        atomic_model = mm
-        break
-    
-    for mm in self.session.models.list():
-      if isinstance(mm, Volume):
-        map_model = mm
-        break
- 
-    score(self.session, atomic_model, map_model, rb_file)
+    if not os.path.isfile(rb_file):
+      print("TEMPY error: File " + rb_file + " does not exist")
+      return
+
+    try:
+      sim_sigma = float(self._widget_sigma.text())
+      rez = float(self._widget_rez.text())
+    except:
+      print("TEMPY Error: Check the values for rez and sigma")
+      return
+
+    # Find models
+    result, atomic_model, map_model = self._select_model_map()
+    if result:
+      score(self.session, atomic_model, map_model, rb_file, sim_sigma, rez)
 
   def _smoc_score(self):
     ''' Compute the smoc score but also plot
@@ -98,45 +154,53 @@ class ToolUI(ToolInstance):
     from .smoc import score
     from PyQt5.QtWidgets import QVBoxLayout
 
-    # TODO - Proper checks for existence
+    # Check Rigid file
     rb_file = self._widget_rigid_file.text()
-  
-    # TODO - For now find the first AtomicStructure and first Volume (eventually, do selected and throw errors)
-    
-    for mm in self.session.models.list():
-      if isinstance(mm, AtomicStructure):
-        atomic_model = mm
-        break
-    
-    for mm in self.session.models.list():
-      if isinstance(mm, Volume):
-        map_model = mm
-        break
+    if not os.path.isfile(rb_file):
+      print("TEMPY error: File " + rb_file + " does not exist")
+      return
 
-    dict_chains_scores, dict_reslist = score(self.session, atomic_model, map_model, rb_file)
+    # Check model and map
+    result, atomic_model, map_model = self._select_model_map()    
+    if not result:
+      return
+  
+    # Check the options
+    try:
+      sim_sigma = float(self._widget_sigma.text())
+      rez = float(self._widget_rez.text())
+      win = int(float(self._widget_window.text()))
+    except:
+      print("TEMPY Error: Check the values for rez, sigma and window.")
+      return
+ 
+    # Call score
+    dict_chains_scores, dict_reslist = score(self.session, atomic_model,
+          map_model, rb_file, sim_sigma, rez, win)
 
     # a figure instance to plot on
-    figure = plt.figure()
-    canvas = FigureCanvas(figure)
-    parent = self.tool_window.ui_area
-    toolbar = NavigationToolbar(canvas, parent)
-     
+    if self._figure == None:
+      self._figure = plt.figure()
+   
     # TODO - This adds a lot more layers if we keep scoring. A good idea to show improvement
-    # perhaps but we may need a way to remove graphs
-    sublayout = QVBoxLayout()
-    sublayout.addWidget(toolbar)
-    sublayout.addWidget(canvas)
+    # perhaps but we may need a way to remove graphs. For now, lets just go with replacement. 
+    if self._canvas == None:
+      self._canvas = FigureCanvas(self._figure)
+      parent = self.tool_window.ui_area
+      toolbar = NavigationToolbar(self._canvas, parent)
+     
+      sublayout = QVBoxLayout()
+      sublayout.addWidget(toolbar)
+      sublayout.addWidget(self._canvas)
     
-    self.top_layout.addLayout(sublayout)
-  
-    # TODO - Really there is only one ch (as one model) for now but eventually there will be more  
-    # TODO - multiple models for this score eventually
-  
+      self.top_layout.addLayout(sublayout)
+      self._subplot = self._figure.add_subplot(111)
+
+
+    # TODO - Really there is only one ch (as one model) for now but eventually there will be more. This all depends on how we work out the selection stuff. Maybe use the model window? 
     for ch in dict_chains_scores:
-      axes =figure.gca()
-      axes.set_ylim([0.4,1.0])
-      figure.xlabel = 'Residue_num'
-      figure.ylabel = 'SMOC'
+      self._figure.xlabel = 'Residue_num'
+      self._figure.ylabel = 'SMOC'
       reslist = []
       scorelist = []
       
@@ -144,12 +208,12 @@ class ToolUI(ToolInstance):
         reslist.append(res)
         scorelist.append(dict_chains_scores[ch][res])
      
-      ax = figure.add_subplot(111)
-      ax.hold(False)
-      ax.plot(reslist,scorelist,linewidth=3.0,label="smoc score")
+      self._subplot.cla()
+      self._subplot.hold(False)
+      self._subplot.plot(reslist,scorelist,linewidth=3.0,label="smoc score")
     
     # refresh canvas
-    canvas.draw()
+    self._canvas.draw()
 
   def _select_rigid_file(self):
     from PyQt5.QtWidgets import QFileDialog

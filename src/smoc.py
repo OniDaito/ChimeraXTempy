@@ -33,7 +33,7 @@ def model_tree(list_coord1,distpot=3.5,list_coord2=None):
     return neigh_points
 
 
-def score(session, atomic_model, map_model, rigid_filename, colour_atoms=True):
+def score(session, atomic_model, map_model, rigid_filename, sim_sigma=0.187, rez = 10.0, window = 9, colour_atoms=True):
   atomlist = []
 
   # TODO - rigid_filename might be optional?
@@ -46,9 +46,6 @@ def score(session, atomic_model, map_model, rigid_filename, colour_atoms=True):
   bio_atom_structure = BioPy_Structure(atomlist)
   bio_map_structure = chimera_to_tempy_map(map_model)
 
-  sim_sigma_coeff = 0.187
-  win=9
-  res_map = 10.0
   slow = 0.50
   shigh = 0.25 # fraction of structure fitted reasonably well initially
   list_zscores = []
@@ -63,7 +60,7 @@ def score(session, atomic_model, map_model, rigid_filename, colour_atoms=True):
 
   dict_chains_scores = {}
 
-  dict_ch_scores,dict_chain_res = sc.SMOC(bio_map_structure, res_map, bio_atom_structure, win, rigid_filename, sim_sigma_coeff)
+  dict_ch_scores,dict_chain_res = sc.SMOC(bio_map_structure, rez, bio_atom_structure, window, rigid_filename, sim_sigma)
  
   # Option to save the rigid file?
   #if rigid_out:

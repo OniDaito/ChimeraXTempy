@@ -46,6 +46,8 @@
     <ChimeraXClassifier>ChimeraX :: Tool :: Tempy :: General :: Show the Tempy options</ChimeraXClassifier>
     <ChimeraXClassifier>ChimeraX :: Command :: sccc :: General :: Calculate the SCCC with Tempy</ChimeraXClassifier>
 ]
+      <ChimeraXClassifier>ChimeraX :: Command :: smoc :: General :: Calculate the SMOC with Tempy</ChimeraXClassifier>
+]
   </Classifiers>
 
 </BundleInfo>
