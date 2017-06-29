@@ -155,10 +155,10 @@ class ToolUI(ToolInstance):
     from PyQt5.QtWidgets import QVBoxLayout
 
     # Check Rigid file
+    # Optional with smoc
     rb_file = self._widget_rigid_file.text()
     if not os.path.isfile(rb_file):
-      print("TEMPY error: File " + rb_file + " does not exist")
-      return
+      rb_file =""
 
     # Check model and map
     result, atomic_model, map_model = self._select_model_map()    

@@ -33,102 +33,103 @@ def model_tree(list_coord1,distpot=3.5,list_coord2=None):
     return neigh_points
 
 
-def score(session, atomic_model, map_model, rigid_filename, sim_sigma=0.187, rez = 10.0, window = 9, colour_atoms=True):
-  atomlist = []
-
+def score(session, atomic_models, map_model, rigid_filename, sim_sigma=0.187, rez = 10.0, window = 9, colour_atoms=True):
+  
   # TODO - rigid_filename might be optional?
 
   sc = ScoringFunctions()
-  
-  for atom in atomic_model.atoms:
-    atomlist.append(chimera_to_tempy_atom(atom, len(atomlist)))
 
-  bio_atom_structure = BioPy_Structure(atomlist)
-  bio_map_structure = chimera_to_tempy_map(map_model)
-
-  slow = 0.50
-  shigh = 0.25 # fraction of structure fitted reasonably well initially
-  list_zscores = []
-  curdir = os.getcwd()
-  rerun_ct=0
-  flag_rerun = 0
-  it = 0
-  dict_reslist = {}
+  rvals = []
  
-  # TODO - So I've removed the iteration bit because we need to think a little more
-  # about what PDBs to check I suspect
+  for atomic_model in atomic_models:
+    atomlist = []
 
-  dict_chains_scores = {}
-
-  dict_ch_scores,dict_chain_res = sc.SMOC(bio_map_structure, rez, bio_atom_structure, window, rigid_filename, sim_sigma)
- 
-  # Option to save the rigid file?
-  #if rigid_out:
-  #  dict_chain_indices, dict_chain_CA = blurrer.get_coordinates(structure_instance)
-  #  rigidf = open(rigid_out_prefix+'_'+lab,'w')
+    for atom in atomic_model.atoms:
+      atomlist.append(chimera_to_tempy_atom(atom, len(atomlist)))
     
-  for ch in dict_ch_scores:
-    flagch = 1
-    dict_res_scores = dict_ch_scores[ch]
-    #get res number list (for ref)
-    if it == 0:
-      dict_reslist[ch] = dict_chain_res[ch][:]
-    try: 
-      if len(dict_reslist[ch]) == 0: 
-        print('Chain missing:', out_iter_pdb, ch)
+    bio_atom_structure = BioPy_Structure(atomlist)
+    bio_map_structure = chimera_to_tempy_map(map_model)
+
+    slow = 0.50
+    shigh = 0.25 # fraction of structure fitted reasonably well initially
+    list_zscores = []
+    curdir = os.getcwd()
+    rerun_ct=0
+    flag_rerun = 0
+    it = 0
+    dict_reslist = {}
+   
+    dict_chains_scores = {}
+
+    dict_ch_scores, dict_chain_res = sc.SMOC(bio_map_structure, rez, bio_atom_structure, window, rigid_filename, sim_sigma)
+   
+    # Option to save the rigid file?
+    #if rigid_out:
+    #  dict_chain_indices, dict_chain_CA = blurrer.get_coordinates(structure_instance)
+    #  rigidf = open(rigid_out_prefix+'_'+lab,'w')
+      
+    for ch in dict_ch_scores:
+      flagch = 1
+      dict_res_scores = dict_ch_scores[ch]
+      #get res number list (for ref)
+      if it == 0:
+        dict_reslist[ch] = dict_chain_res[ch][:]
+      try: 
+        if len(dict_reslist[ch]) == 0: 
+          print('Chain missing:', out_iter_pdb, ch)
+          flagch = 0
+          continue
+      except KeyError: 
+        print('Chain not common:', ch, out_iter_pdb)
         flagch = 0
         continue
-    except KeyError: 
-      print('Chain not common:', ch, out_iter_pdb)
-      flagch = 0
-      continue
-    try: reslist = dict_reslist[ch]
-    except KeyError:
-      print('Chain not common:', ch, out_iter_pdb)
-      flagch = 0
-      continue
-    if not ch in dict_chains_scores: dict_chains_scores[ch] = {}
-    scorelist = []
-    for res in reslist:
-      try: scorelist.append(dict_res_scores[res])
-      except KeyError: 
-        if reslist.index(res) <= 0: scorelist.append(dict_res_scores[reslist[reslist.index(res)+1]])
-        else: 
-          try:  scorelist.append(dict_res_scores[reslist[reslist.index(res)-1]])
-          except IndexError: scorelist.append(0.0)
-      #save scores for each chain
-      curscore = "{0:.2f}".format(round(scorelist[-1],2))
-      try: 
-        dict_chains_scores[ch][res][it] = str(curscore)
-      except KeyError: 
-        dict_chains_scores[ch][res] = [str(0.0)]
-        dict_chains_scores[ch][res][it] = str(curscore)
-    
-        
-    #calc ratio between current and prev scores
-    if it > 0:
-      score_cur = scorelist[:]
-      score_inc = [(1+x)/(1+y) for x, y in zip(score_cur, score_prev)][:]
-      score_diff = [(x-y) for x, y in zip(score_cur, score_prev)][:]
-    #calculate z-scores
-    npscorelist = np.array(scorelist)
-    try: list_zscores.append((npscorelist-np.mean(npscorelist))/np.std(npscorelist))
-    except: list_zscores.append((npscorelist-np.mean(npscorelist)))
-    #calculate low and high score bounds
-    list_sccc = scorelist[:]
-    score_prev = scorelist[:]
-    list_sccc.sort()
+      try: reslist = dict_reslist[ch]
+      except KeyError:
+        print('Chain not common:', ch, out_iter_pdb)
+        flagch = 0
+        continue
+      if not ch in dict_chains_scores: dict_chains_scores[ch] = {}
+      scorelist = []
+      for res in reslist:
+        try: scorelist.append(dict_res_scores[res])
+        except KeyError: 
+          if reslist.index(res) <= 0: scorelist.append(dict_res_scores[reslist[reslist.index(res)+1]])
+          else: 
+            try:  scorelist.append(dict_res_scores[reslist[reslist.index(res)-1]])
+            except IndexError: scorelist.append(0.0)
+        #save scores for each chain
+        curscore = "{0:.2f}".format(round(scorelist[-1],2))
+        try: 
+          dict_chains_scores[ch][res][it] = str(curscore)
+        except KeyError: 
+          dict_chains_scores[ch][res] = [str(0.0)]
+          dict_chains_scores[ch][res][it] = str(curscore)
+      
+          
+      #calc ratio between current and prev scores
+      if it > 0:
+        score_cur = scorelist[:]
+        score_inc = [(1+x)/(1+y) for x, y in zip(score_cur, score_prev)][:]
+        score_diff = [(x-y) for x, y in zip(score_cur, score_prev)][:]
+      #calculate z-scores
+      npscorelist = np.array(scorelist)
+      try: list_zscores.append((npscorelist-np.mean(npscorelist))/np.std(npscorelist))
+      except: list_zscores.append((npscorelist-np.mean(npscorelist)))
+      #calculate low and high score bounds
+      list_sccc = scorelist[:]
+      score_prev = scorelist[:]
+      list_sccc.sort()
 
-    #save avg of highest and lowest 20%  
-    avglow = list_sccc[int(len(list_sccc)*slow)]
-    if avglow == 0.0: avglow = 0.00001
-    avghigh = list_sccc[int(len(list_sccc)*(1-shigh))]
-    if it == 0: avghigh1 = list_sccc[int(len(list_sccc)*(1-shigh))]
-    curratio = avghigh/avglow
-         
-    #print it, 'Num of good scoring residues', len(goodset)
-    print (ch, 'avg-top25%, avg-low25%, avg-high/avg-low', avghigh, avglow, avghigh/avglow)
-    print (ch, 'avg', sum(scorelist)/len(scorelist))
+      #save avg of highest and lowest 20%  
+      avglow = list_sccc[int(len(list_sccc)*slow)]
+      if avglow == 0.0: avglow = 0.00001
+      avghigh = list_sccc[int(len(list_sccc)*(1-shigh))]
+      if it == 0: avghigh1 = list_sccc[int(len(list_sccc)*(1-shigh))]
+      curratio = avghigh/avglow
+           
+      #print it, 'Num of good scoring residues', len(goodset)
+      print (ch, 'avg-top25%, avg-low25%, avg-high/avg-low', avghigh, avglow, avghigh/avglow)
+      print (ch, 'avg', sum(scorelist)/len(scorelist))
 
     #include smoc scores as b-factor records
     for x in bio_atom_structure.atomList:
@@ -143,4 +144,6 @@ def score(session, atomic_model, map_model, rigid_filename, sim_sigma=0.187, rez
       else:
         x.temp_fac = 0.0
 
-    return dict_chains_scores, dict_reslist
+    rvals.append((dict_chains_scores, dict_reslist))
+
+  return rvals

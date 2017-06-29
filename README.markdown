@@ -47,9 +47,11 @@ Inside ChimeraX with the command line, you can compute the sccc with the followi
 
     sccc (#1) (#2) ~/Projects/ChimeraXTempy/test/rigid_RF.txt
 
-Where #1 is the pdb model, #2 is the map. The SMOC is the same:
+Where #1 is the pdb model, #2 is the map. The SMOC is similar:
 
-    smoc (#1) (#2) ~/Projects/ChimeraXTempy/test/rigid_RF.txt
+    smoc (#1,2) (#3)
+
+You can pass in multiple models as the first parameter in order to compare scores.
 
 ## Testing
 
