@@ -104,24 +104,45 @@ class ToolUI(ToolInstance):
     atomic_model = None
     map_model = None
 
-    for mm in self.session.models.list():
+    for mm in self.session.selection.models():
       if isinstance(mm, AtomicStructure):
-        # TODO - selected doesnt seem to work too well :/
-        #if mm.selected:
         atomic_model = mm
         break
     
-    for mm in self.session.models.list():
+    for mm in self.session.selection.models():
       if isinstance(mm, Volume):
-        if mm.selected:
-          map_model = mm
-          break
+        map_model = mm
+        break
  
     if atomic_model == None or map_model == None:
       print("TEMPY Error: Please select one model and one map.")
       return (False, None, None)
     
     return (True, atomic_model, map_model)
+
+  def _select_models_map(self):
+    ''' Our way of selecting the models and map for scoring with smoc.
+    We take the first model we find and the first map we 
+    find that are selected. Probably needs improvement.'''
+
+    atomic_models = []
+    map_model = None
+    
+    for mm in self.session.selection.models():
+      if isinstance(mm, AtomicStructure):
+          atomic_models.append(mm)
+    
+    for mm in self.session.selection.models():
+      if isinstance(mm, Volume):
+          map_model = mm
+          break
+ 
+    if len(atomic_models) == 0 or map_model == None:
+      print("TEMPY Error: Please select one or more models and one map.")
+      return (False, None, None)
+    
+    return (True, atomic_models, map_model)
+
 
   def _sccc_score(self):
     ''' Run the sccc score as a graphical function, 
@@ -161,7 +182,7 @@ class ToolUI(ToolInstance):
       rb_file =""
 
     # Check model and map
-    result, atomic_model, map_model = self._select_model_map()    
+    result, atomic_models, map_model = self._select_models_map()    
     if not result:
       return
   
@@ -174,10 +195,6 @@ class ToolUI(ToolInstance):
       print("TEMPY Error: Check the values for rez, sigma and window.")
       return
  
-    # Call score
-    dict_chains_scores, dict_reslist = score(self.session, atomic_model,
-          map_model, rb_file, sim_sigma, rez, win)
-
     # a figure instance to plot on
     if self._figure == None:
       self._figure = plt.figure()
@@ -195,23 +212,32 @@ class ToolUI(ToolInstance):
     
       self.top_layout.addLayout(sublayout)
       self._subplot = self._figure.add_subplot(111)
-
-
-    # TODO - Really there is only one ch (as one model) for now but eventually there will be more. This all depends on how we work out the selection stuff. Maybe use the model window? 
-    for ch in dict_chains_scores:
       self._figure.xlabel = 'Residue_num'
       self._figure.ylabel = 'SMOC'
-      reslist = []
-      scorelist = []
+ 
+    self._subplot.cla()
+    self._subplot.hold(True)
+    # Call score
+    idx = 0
+    for (dict_chains_scores, dict_reslist) in score(self.session, atomic_models,
+        map_model, rb_file, sim_sigma, rez, win):
+
+      for ch in dict_chains_scores:
+        reslist = []
+        scorelist = []
+        
+        for res in dict_reslist[ch]:
+          reslist.append(res)
+          scorelist.append(dict_chains_scores[ch][res])
+       
+
+
+        col = atomic_models[idx].single_color
+        col = (float(col[0])/256.0,float(col[1])/256.0,float(col[2])/256.0)
+        self._subplot.plot(reslist,scorelist,linewidth=1.0,label="smoc score", color=col)
       
-      for res in dict_reslist[ch]:
-        reslist.append(res)
-        scorelist.append(dict_chains_scores[ch][res])
-     
-      self._subplot.cla()
-      self._subplot.hold(False)
-      self._subplot.plot(reslist,scorelist,linewidth=3.0,label="smoc score")
-    
+      idx+=1
+
     # refresh canvas
     self._canvas.draw()
 

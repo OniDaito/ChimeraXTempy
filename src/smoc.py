@@ -40,7 +40,7 @@ def score(session, atomic_models, map_model, rigid_filename, sim_sigma=0.187, re
   sc = ScoringFunctions()
 
   rvals = []
- 
+  
   for atomic_model in atomic_models:
     atomlist = []
 

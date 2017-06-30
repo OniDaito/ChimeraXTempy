@@ -3,7 +3,7 @@
 Welcome to the ChimeraXTempy bundle plugin. This project combines tempy with ChimeraX for scoring EM fitting.
 
 ## History & Version
-Currently at version 0.0.2
+Currently at version 0.0.3
 
 ## Building
 
@@ -43,6 +43,31 @@ This creates a python wheel bundle in the dist directory. You can then use this 
 
 ## How to use this plugin
 
+### Windowed tool
+
+Go to the following menu
+
+    General -> Tempy
+
+The window should appear in your general set of tools, usually to the right of the screen.
+
+To score with SCCC you need to select one map, one model and make sure you have set the *rigid file* dialog. Assuming that model 1 is a model and model 2 is a volume map:
+
+    sel #1 #2 
+
+The *rigid file* button will launch a file dialog so you can select the correct rigid file for scoring. You can then press the *sccc* button. If you want to change the resolution of the map (in Angstroms) you can do this from the *Res.* textbox. *sigma* can also be set from the neighbouring text box.
+
+The SMOC score can accept multiple models. To use this feature, you can perform multiple selects:
+
+    sel #1 #2 #3
+
+Each model is scored against a single map, and plotted in the tempy dialog box. Depending on the size of your screen the graph might not appear. You may need to stretch the tempy window if it is docked.
+
+The SMOC score accepts the *Res.*, *sigma* and *window* parameters. Once you have selected at least one model and one map, press the *SMOC* button.
+
+Scores and messages appear in the *log* screen.
+
+### Command-line tools
 Inside ChimeraX with the command line, you can compute the sccc with the following command
 
     sccc (#1) (#2) ~/Projects/ChimeraXTempy/test/rigid_RF.txt

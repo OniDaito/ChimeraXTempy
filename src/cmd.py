@@ -5,6 +5,8 @@
 
 from chimerax.core.commands import CmdDesc, AtomSpecArg, FileNameArg
 from chimerax.core.commands import StringArg, BoolArg, FloatArg, IntArg, EnumOf, ModelArg, ModelsArg
+from chimerax.core.map.volume import Volume
+from chimerax.core.atomic.structure import AtomicStructure
 
 
 def sccc(session, scoringModel=None, scoringMap=None, rigidFile="rigid.txt", simSigma=0.187, rez=10.0):
@@ -36,7 +38,18 @@ def smoc(session, scoringModels=None, scoringMap=None, simSigma=0.187, rez=10.0,
   
   from .smoc import score
   from PyQt5 import QtWidgets
- 
+
+  # Check the parameters for models and maps
+  for mm in scoringModels:
+    if not isinstance(mm, AtomicStructure):
+      print("TEMPY Error: Please provide model(s) for the first parameter.")
+      return
+    
+    if not isinstance(scoringMap, Volume):
+      print("TEMPY Error: Please provide a map for the second parameter.")
+      return
+   
+  # Now do the scoring and print the scores
   scores = score(session, scoringModels, scoringMap, "",simSigma,rez,window)
 
   idx = 1
