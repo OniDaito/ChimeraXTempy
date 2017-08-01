@@ -113,7 +113,9 @@ class MapParser:
         Return:
            A Map instance containing the data read from MRC map file.
         """
-        
+       
+        print("READING MRC")
+
         mrc2numpy = {
             0: numpy.uint8,
             1: numpy.int16,
@@ -145,7 +147,7 @@ class MapParser:
         list_orig = [0.0, 0.0, 0.0]
 
         try:
-                if header[52:56] == ('M','A','P',' '):
+                if header[52:56] == (b'M',b'A',b'P',b' '):
                         #print 'MAP flag found (MRC2000)'
                         origin = header[49:52]
                         #print 'Origin record: ', origin

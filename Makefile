@@ -12,7 +12,7 @@
 # When uploaded to the ChimeraX toolshed, the bundle
 # will be displayed without the ChimeraX- prefix.
 BUNDLE_NAME = ChimeraX-Tempy
-BUNDLE_VERSION = 0.0.2
+BUNDLE_VERSION = 0.0.4
 # ChimeraX bundles should only include packages
 # that install as chimerax.package_name.
 # General Python packages should be uploaded to

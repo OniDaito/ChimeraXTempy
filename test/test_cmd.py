@@ -11,7 +11,6 @@ import unittest
 import sys, os, re
 sys.path.insert(0, "../TEMPy")
  
-from TEMPy.StructureBlurrer import StructureBlurrer
 from TEMPy.StructureParser import PDBParser
 from TEMPy.MapParser import MapParser
 from TEMPy.RigidBodyParser import RBParser
@@ -40,16 +39,19 @@ class TestSCCC(unittest.TestCase):
 
     path_test = "./"
     m = os.path.join(path_test,'1akeA_10A.mrc')
-    p = os.path.join(path_test,'final1_mdcg.pdb')
+    p = os.path.join(path_test,'1ake_mdl1.pdb')
     r = 10.0
-    rb_file = os.path.join(path_test,'rigid_RF.txt')
+    rb_file = os.path.join(path_test,'1ake_mdl1_rigid.txt')
     
-    # make class instances for density simulation (blurring), scoring and plot scores
-    blurrer = StructureBlurrer()
     scorer = ScoringFunctions()
 
     # read map file
     emmap=MapParser.readMRC(m)
+
+    # Setting the origin correctly fixes the test so there is something going on here
+    print ("origin test", emmap.origin)
+
+    #emmap.origin = (-6.494, 13.381001, -5.4099998)
 
     # read PDB file
     structure_instance=PDBParser.read_PDB_file('pdbfile', p, hetatm=False, water=False)
@@ -63,16 +65,17 @@ class TestSCCC(unittest.TestCase):
     print('calculating scores')
     for RB in listRB:
       # sccc score
-      score_SCCC=scorer.SCCC(emmap,r,sim_sigma_coeff,structure_instance,RB,c_mode=False)
-      SCCC_list_structure_instance.append(score_SCCC)
+      score_SCCC=scorer.SCCC(emmap,r,sim_sigma_coeff,structure_instance,RB)
       print ('>>', score_SCCC)
       listsc_sccc.append(score_SCCC)
 
-    self.assertTrue(len(listRB) == 4)
-    self.assertTrue(round(listsc_sccc[0],4) - 0.672 < 0.01) 
-    self.assertTrue(round(listsc_sccc[1],4) - 0.642 < 0.01) 
-    self.assertTrue(round(listsc_sccc[2],4) - 0.704 < 0.01) 
-    self.assertTrue(round(listsc_sccc[3],4) - 0.495 < 0.01) 
+    self.assertTrue(len(listRB) == 6)
+    self.assertTrue(abs(round(listsc_sccc[0],4) - 0.954) < 0.01) 
+    self.assertTrue(abs(round(listsc_sccc[1],4) - 0.427) < 0.01) 
+    self.assertTrue(abs(round(listsc_sccc[2],4) - 0.624) < 0.01) 
+    self.assertTrue(abs(round(listsc_sccc[3],4) - 0.838) < 0.01) 
+    self.assertTrue(abs(round(listsc_sccc[4],4) - 0.971) < 0.01) 
+    self.assertTrue(abs(round(listsc_sccc[5],4) - 0.928) < 0.01) 
 
   def test_chimera_sccc(self):
     pass
@@ -101,10 +104,10 @@ class TestSMOC(unittest.TestCase):
     win=9
      
     path_test = os.getcwd()
-    map_file = os.path.join(path_test,'1ake_molmap45_pad10_cubic.mrc')
+    map_file = os.path.join(path_test,'1akeA_10A.mrc')
     res_map = 10.0
     DATADIR = path_test
-    list_to_check = ['mdl1.pdb','mdl_ss2.pdb','mdl_ss2_all1.pdb','1ake.pdb']
+    list_to_check = ['1ake_mdl1.pdb']
    
     if len(list_labels) == 0: list_labels = [x.split('.')[0] for x in list_to_check]#['initial','final']
     list_styles = [':','-.','--','-','-',':','-.','--','-','-',':','-.','--','-','-',':','-.','--','-','-',':','-.','--','-','-']#'--'
@@ -130,7 +133,6 @@ class TestSMOC(unittest.TestCase):
     shigh = 0.25 # fraction of structure fitted reasonably well initially
     rigidbody_file = None
 
-    blurrer = StructureBlurrer()
     sc = ScoringFunctions()
     emmap=MapParser.readMRC(map_file)
 
@@ -223,6 +225,11 @@ class TestSMOC(unittest.TestCase):
         #print it, 'Num of good scoring residues', len(goodset)
         print (list_to_check[it],ch, 'avg-top25%, avg-low25%, avg-high/avg-low', avghigh, avglow, avghigh/avglow)
         print (list_to_check[it],ch, 'avg', sum(scorelist)/len(scorelist))
+
+        self.assertTrue( abs(avghigh - 0.967) < 0.01)
+        self.assertTrue( abs(avglow - 0.956) < 0.01)
+        self.assertTrue( abs(sum(scorelist)/len(scorelist) - 0.899) < 0.01)
+
 
       #include smoc scores as b-factor records
       for x in structure_instance.atomList:

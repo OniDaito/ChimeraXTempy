@@ -58,17 +58,20 @@ def chimera_to_tempy_atom(atom, serial):
 def chimera_to_tempy_map(cmap):
   """ Convert a Chimera Map into a tempy one """
   
-  apix = 3.0 # TODO - Not sure what this is but will check
+  apix = 3.0 # TODO - Not sure what this is but will check - step?
   origin = cmap.data.origin
-  
-  # TODO - There is an issue with the origin - need to figure that out
-  origin = (0,0,0)
-
+ 
   # Grid_Data is the ChimeraX class we are after here
   # TODO - cmap.matrix *should* return a numpy array which is what we are after I *think*
   # Don't know if its actually correct. In both test and here its all zeros (but has a distinct shape)
   actual_map = cmap.matrix()
+ 
+  # I still can't find the actual map data but this seems to work for now
+  #tstep = (int(d.data_step[0]),int(d.data_step[1]),int(d.data_step[2]))    
+  #mmm = mrc_data.read_matrix((0,0,0), d.data_size, tstep, None)
+
   mt = Map(actual_map, origin, apix, "nofilename") 
+
 
   return mt
 
