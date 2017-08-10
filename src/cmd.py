@@ -45,9 +45,9 @@ def smoc(session, scoringModels=None, scoringMap=None, simSigma=0.187, rez=10.0,
       print("TEMPY Error: Please provide model(s) for the first parameter.")
       return
     
-    if not isinstance(scoringMap, Volume):
-      print("TEMPY Error: Please provide a map for the second parameter.")
-      return
+  if not isinstance(scoringMap, Volume):
+    print("TEMPY Error: Please provide a map for the second parameter.")
+    return
    
   # Now do the scoring and print the scores
   scores = score(session, scoringModels, scoringMap, "",simSigma,rez,window)
@@ -84,3 +84,40 @@ smoc_desc = CmdDesc(required=[("scoringModels", ModelsArg),
 def register_smoc():
     from chimerax.core.commands import register
     register('smoc', smoc_desc, smoc)
+
+
+def nmi(session, scoringMapModel1=None, scoringMapModel2=None, rez1=None, rez2=None, contour1=None, contour2=None):
+  ''' Calculate the nmi score using the parameters above from the command line
+  interface. e.g nmi (#1) (#2) 6.6 4.0. Optional parameters are the resolutions and contours.'''
+  
+  from .nmi import score
+  from PyQt5 import QtWidgets
+
+  nmi_score = 0.0
+  if isinstance(scoringMapModel1, AtomicStructure) and isinstance(scoringMapModel2, AtomicStructure):
+    nmi_score = score(session, scoringMapModel1, None, scoringMapModel2, None, rez1, rez2, contour1, contour2 )
+  elif isinstance(scoringMapModel1, Volume) and isinstance(scoringMapModel2, AtomicStructure):
+    nmi_score = score(session, scoringMapModel2, scoringMapModel1, None, None, rez1, rez2, contour1, contour2 )
+  elif isinstance(scoringMapModel1, AtomicStructure) and isinstance(scoringMapModel2, Volume):
+    print("AHA!")
+    nmi_score = score(session, scoringMapModel1, scoringMapModel2, None, None,rez1, rez2, contour1, contour2 )
+  elif isinstance(scoringMapModel1, Volume) and isinstance(scoringMapModel2, Volume):
+    nmi_score = score(session, None, scoringMapModel1, None, scoringMapModel2, rez1, rez2, contour1, contour2 )
+  else :
+    print("TEMPY Error: Please provide a model or map for the second parameter.")
+    return
+    
+  print("NMI Score: ", nmi_score)
+
+nmi_desc = CmdDesc(required=[("scoringMapModel1", ModelArg), 
+                          ("scoringMapModel2", ModelArg),],
+                          optional=[("rez1",FloatArg),
+                            ("rez2",FloatArg),
+                            ("contour1",FloatArg),
+                            ("contour2",FloatArg),],
+                      keyword=[("log", BoolArg)],
+                      synopsis="The Tempy NMI function")
+    
+def register_nmi():
+    from chimerax.core.commands import register
+    register('nmi', nmi_desc, nmi)

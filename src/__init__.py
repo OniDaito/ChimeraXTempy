@@ -29,5 +29,9 @@ class _MyAPI(BundleAPI):
     if command_name == "smoc":
       from . import cmd
       cmd.register_smoc()
+ 
+    if command_name == "nmi":
+      from . import cmd
+      cmd.register_nmi()
     
 bundle_api = _MyAPI()

@@ -17,6 +17,7 @@ from TEMPy.RigidBodyParser import RBParser
 from TEMPy.ShowPlot import Plot
 from TEMPy.ScoringFunctions import ScoringFunctions
 from TEMPy.class_arg import TempyParser
+from TEMPy.StructureBlurrer import StructureBlurrer
 
 import numpy as np
 import shutil,glob
@@ -48,12 +49,7 @@ class TestSCCC(unittest.TestCase):
     # read map file
     emmap=MapParser.readMRC(m)
 
-    # Setting the origin correctly fixes the test so there is something going on here
-    print ("origin test", emmap.origin)
-
-    #emmap.origin = (-6.494, 13.381001, -5.4099998)
-
-    # read PDB file
+      # read PDB file
     structure_instance=PDBParser.read_PDB_file('pdbfile', p, hetatm=False, water=False)
     SCCC_list_structure_instance=[]
     
@@ -62,11 +58,10 @@ class TestSCCC(unittest.TestCase):
     
     # score each rigid body segment
     listsc_sccc = []
-    print('calculating scores')
+    
     for RB in listRB:
       # sccc score
       score_SCCC=scorer.SCCC(emmap,r,sim_sigma_coeff,structure_instance,RB)
-      print ('>>', score_SCCC)
       listsc_sccc.append(score_SCCC)
 
     self.assertTrue(len(listRB) == 6)
@@ -222,10 +217,6 @@ class TestSMOC(unittest.TestCase):
         if it == 0: avghigh1 = list_sccc[int(len(list_sccc)*(1-shigh))]
         curratio = avghigh/avglow
                     
-        #print it, 'Num of good scoring residues', len(goodset)
-        print (list_to_check[it],ch, 'avg-top25%, avg-low25%, avg-high/avg-low', avghigh, avglow, avghigh/avglow)
-        print (list_to_check[it],ch, 'avg', sum(scorelist)/len(scorelist))
-
         self.assertTrue( abs(avghigh - 0.967) < 0.01)
         self.assertTrue( abs(avglow - 0.956) < 0.01)
         self.assertTrue( abs(sum(scorelist)/len(scorelist) - 0.899) < 0.01)
@@ -246,6 +237,139 @@ class TestSMOC(unittest.TestCase):
       
       it = it+1
       iter_num = iter_num-1
+
+
+#calculate map contour
+def map_contour(m,t=-1.):
+  mName = os.path.basename(m).split('.')[0]
+  #print 'reading map'
+  emmap=MapParser.readMRC(m)
+  c1 = None
+  if t != -1.0:
+    zeropeak,ave,sigma1 = emmap._peak_density()
+    if not zeropeak is None: c1 = zeropeak+(t*sigma1)
+    else:
+      c1 = 0.0
+  return mName,emmap,c1
+
+#calculate model contour
+def model_contour(p,res=4.0,emmap=False,t=-1.):
+  pName,modelmap = blur_model(p,res,emmap)
+  c1 = None
+  if t != -1.0:
+    c1 = t*emmap.std()#0.0
+  return pName,modelmap,c1
+
+def blur_model(p,res=4.0,emmap=False):
+  pName = os.path.basename(p).split('.')[0]
+  structure_instance=PDBParser.read_PDB_file(pName,p,hetatm=False,water=False)
+  blurrer = StructureBlurrer()
+  if res is None:
+    sys.exit('Map resolution required..')
+  modelmap = blurrer.gaussian_blur_real_space(structure_instance, res,densMap=emmap,normalise=True) 
+  return pName,modelmap
+
+def lpfilter(emmap,r):
+  cutoff = emmap.apix/float(r)
+  mapfilt = emmap._tanh_lowpass(cutoff)
+  return mapfilt 
+
+def match_grid(emmap1,emmap2,c1,c2):
+  # DETERMINE A COMMON ALIGNMENT BOX : fill minvalue for extra voxel pads
+  spacing = emmap2.apix
+  if emmap2.apix < emmap1.apix: spacing = emmap1.apix
+  grid_shape, new_ori = emmap1._alignment_box(emmap2,spacing)
+  # INTERPOLATE TO NEW GRID
+  try: emmap_1 = emmap1._interpolate_to_grid1(grid_shape,spacing,new_ori)
+  except: emmap_1 = emmap1._interpolate_to_grid(grid_shape,spacing,new_ori)
+  try: c1 = emmap_1._find_level(np.sum(emmap1.fullMap>c1)*(emmap1.apix**3))
+  except: pass
+  del emmap1.fullMap
+  del emmap1
+  try: emmap_2 = emmap2._interpolate_to_grid1(grid_shape,spacing,new_ori)
+  except: emmap_2 = emmap2._interpolate_to_grid(grid_shape,spacing,new_ori)
+  try: c2 = emmap_2._find_level(np.sum(emmap2.fullMap>c2)*(emmap2.apix**3))
+  except: pass
+  del emmap2.fullMap
+  del emmap2
+  return emmap_1, emmap_2
+
+
+
+class TestNMI(unittest.TestCase):
+  # Only use setUp() and tearDown() if necessary
+  def setUp(self):
+    pass
+
+  def tearDown(self):
+    pass
+
+  def test_tempy_nmi(self):
+    ''' Test the tempy nmi score based on the files
+    provided. Use this as a baseline for the second
+    chimeraX test. '''
+
+    path_test = "./"
+    m = os.path.join(path_test,'emd_5168.map')
+    p = os.path.join(path_test,'emd_5170.map')
+   
+    sc = ScoringFunctions()
+
+    rez1 = 6.6
+    rez2 = 15.0
+
+    Name1,emmap1,c1 = map_contour(m,t=1.5)
+    Name2,emmap2,c2 = map_contour(p,t=1.5)
+   
+    print(rez1,rez2,c1,c2,emmap1.apix, emmap2.apix)
+
+    if not sc.mapComparison(emmap1,emmap2):
+      emmap1._crop_box(c1,0.5)
+      emmap2._crop_box(c2,0.5)
+      
+      if rez1 > 1.25*rez2: 
+        emmap_2 = lpfilter(emmap2,rez1)
+        emmap1, emmap2 = match_grid(emmap1,emmap_2,c1,c2)
+      elif rez2 > 1.25*rez1:
+        emmap_1 = lpfilter(emmap1,rez2)
+        emmap1, emmap2 = match_grid(emmap_1,emmap2,c1,c2)
+      else:
+        emmap1, emmap2 = match_grid(emmap1,emmap2,c1,c2)
+   
+    nmi = 0
+    try:
+      nmi = sc.MI(emmap1,emmap2,c1,c2,1,None,None,True)
+      if nmi < 0.0: nmi = 0.0
+    except:
+      self.assertTrue(False)
+      print_exc()
+      nmi = 0.0
+   
+    self.assertTrue(abs(round(nmi,5) - 1.0492) < 0.001) 
+
+    # Now test with a model and map
+    p = os.path.join(path_test,'1J6Z.pdb')
+    m = os.path.join(path_test,'emd_5168_monomer.mrc')
+    res = 6.6
+    Name1 = os.path.basename(m).split('.')[0]
+    Name2 = os.path.basename(p).split('.')[0]
+    emmap1=MapParser.readMRC(m)
+    structure_instance=PDBParser.read_PDB_file(Name2,p,hetatm=False,water=False)
+    blurrer = StructureBlurrer()
+    emmap2 = blurrer.gaussian_blur(structure_instance, res,densMap=emmap1)
+    c1 = 9.7
+    c2 = 1.0
+
+    nmi = 0
+    try:
+      nmi = sc.MI(emmap1,emmap2,c1,c2,1,None,None,True)
+      if nmi < 0.0: nmi = 0.0
+    except:
+      self.assertTrue(False)
+      print_exc()
+      nmi = 0.0
+  
+    self.assertTrue(abs(round(nmi,5) - 1.0575) < 0.001) 
 
 if __name__ == '__main__':
   unittest.main()

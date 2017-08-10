@@ -51,6 +51,10 @@ class ToolUI(ToolInstance):
     button_smoc = QPushButton("SMOC")
     button_smoc.clicked.connect(self._smoc_score)
     button_layout.addWidget(button_smoc)
+    
+    button_nmi = QPushButton("NMI")
+    button_nmi.clicked.connect(self._nmi_score)
+    button_layout.addWidget(button_nmi)
   
     # Options for the two scores
 
@@ -58,21 +62,52 @@ class ToolUI(ToolInstance):
     layout.addLayout(options_layout)
 
     label_rez = QLabel("Res.")
+    label_rez2 = QLabel("Res.2")
     label_sigma = QLabel("Sigma")
     label_window = QLabel("Window")
 
+    label_c1 = QLabel("c.1")
+    label_c2 = QLabel("c.2")
+    
+    label_rez.setFixedSize(40,30)
+    label_rez2.setFixedSize(40,30)
+    label_c1.setFixedSize(40,30)
+    label_c2.setFixedSize(40,30)
+    label_sigma.setFixedSize(60,30)
+    label_window.setFixedSize(70,30)
+    
     self._widget_sigma = QLineEdit()
     self._widget_rez = QLineEdit()
+    self._widget_rez2 = QLineEdit()
+    self._widget_c1 = QLineEdit()
+    self._widget_c2 = QLineEdit()
     self._widget_window = QLineEdit()
+
+    self._widget_rez.setFixedSize(40,30)
+    self._widget_rez2.setFixedSize(40,30)
+    self._widget_c1.setFixedSize(40,30)
+    self._widget_c2.setFixedSize(40,30)
+    self._widget_sigma.setFixedSize(50,30)
+    self._widget_window.setFixedSize(40,30)
 
     options_layout.addWidget(label_rez)
     options_layout.addWidget(self._widget_rez)
+    options_layout.addWidget(label_rez2)
+    options_layout.addWidget(self._widget_rez2)
     options_layout.addWidget(label_sigma)
     options_layout.addWidget(self._widget_sigma)
     options_layout.addWidget(label_window)
     options_layout.addWidget(self._widget_window)
+    options_layout.addWidget(label_c1)
+    options_layout.addWidget(self._widget_c1)
+    options_layout.addWidget(label_c2)
+    options_layout.addWidget(self._widget_c2)
 
     self._widget_rez.setText("10.0")
+    self._widget_rez2.setText("10.0")
+    self._widget_c1.setText("10.0")
+    self._widget_c2.setText("10.0")
+
     self._widget_sigma.setText("0.187")
     self._widget_window.setText("9")
 
@@ -143,6 +178,15 @@ class ToolUI(ToolInstance):
     
     return (True, atomic_models, map_model)
 
+  def _select_two(self):
+    ''' Take the first two things selected. We will see what they are used
+    for later. Used in the NMI scoring.'''
+
+    if len(self.session.selection.models()) >= 2:
+      return (True, self.session.selection.models()[0], self.session.selection.models()[1])
+  
+    print("TEMPY Error: Please select two maps/models.")
+    return(False,None,None)
 
   def _sccc_score(self):
     ''' Run the sccc score as a graphical function, 
@@ -217,6 +261,7 @@ class ToolUI(ToolInstance):
  
     self._subplot.cla()
     self._subplot.hold(True)
+    
     # Call score
     idx = 0
     for (dict_chains_scores, dict_reslist) in score(self.session, atomic_models,
@@ -230,8 +275,6 @@ class ToolUI(ToolInstance):
           reslist.append(res)
           scorelist.append(dict_chains_scores[ch][res])
        
-
-
         col = atomic_models[idx].single_color
         col = (float(col[0])/256.0,float(col[1])/256.0,float(col[2])/256.0)
         self._subplot.plot(reslist,scorelist,linewidth=1.0,label="smoc score", color=col)
@@ -240,6 +283,37 @@ class ToolUI(ToolInstance):
 
     # refresh canvas
     self._canvas.draw()
+
+  def _nmi_score(self):
+    ''' Run the nmi score, printing to the log'''
+    from .nmi import score
+
+    try:
+      rez1 = float(self._widget_rez.text())
+      rez2 = float(self._widget_rez2.text())
+      contour1 = float(self._widget_c1.text())
+      contour2 = float(self._widget_c2.text()) 
+    except:
+      print("TEMPY Error: Check the values for rez1, rez2, c1 and c2")
+      return
+
+    # Find models
+    result, scoringMapModel1, scoringMapModel2 = self._select_two()
+    nmi_score = 0.0
+    if result:
+      if isinstance(scoringMapModel1, AtomicStructure) and isinstance(scoringMapModel2, AtomicStructure):
+        nmi_score = score(self.session, scoringMapModel1, None, scoringMapModel2, None, rez1, rez2, contour1, contour2 )
+      elif isinstance(scoringMapModel1, Volume) and isinstance(scoringMapModel2, AtomicStructure):
+        nmi_score = score(self.session, scoringMapModel2, scoringMapModel1, None, None, rez1, rez2, contour1, contour2 )
+      elif isinstance(scoringMapModel1, AtomicStructure) and isinstance(scoringMapModel2, Volume):
+        nmi_score = score(self.session, scoringMapModel1, scoringMapModel2, None, None,rez1, rez2, contour1, contour2 )
+      elif isinstance(scoringMapModel1, Volume) and isinstance(scoringMapModel2, Volume):
+        nmi_score = score(self.session, None, scoringMapModel1, None, scoringMapModel2, rez1, rez2, contour1, contour2 )
+      else :
+        print("TEMPY Error: Please provide a model or map for the second parameter.")
+        return
+        
+      print("NMI Score: ", nmi_score)
 
   def _select_rigid_file(self):
     from PyQt5.QtWidgets import QFileDialog

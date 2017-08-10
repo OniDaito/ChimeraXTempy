@@ -1,4 +1,4 @@
-<BundleInfo name="ChimeraX-Tempy" version="0.0.4" package="chimerax.tempy"
+<BundleInfo name="ChimeraX-Tempy" version="0.0.5" package="chimerax.tempy"
   	    minSessionVersion="1" maxSessionVersion="1">
 
   <!-- Additional information about bundle source -->
@@ -46,7 +46,9 @@
     <ChimeraXClassifier>ChimeraX :: Tool :: Tempy :: General :: Show the Tempy options</ChimeraXClassifier>
     <ChimeraXClassifier>ChimeraX :: Command :: sccc :: General :: Calculate the SCCC with Tempy</ChimeraXClassifier>
 ]
-      <ChimeraXClassifier>ChimeraX :: Command :: smoc :: General :: Calculate the SMOC with Tempy</ChimeraXClassifier>
+    <ChimeraXClassifier>ChimeraX :: Command :: smoc :: General :: Calculate the SMOC with Tempy</ChimeraXClassifier>
+    ]
+    <ChimeraXClassifier>ChimeraX :: Command :: nmi :: General :: Calculate the NMI with Tempy</ChimeraXClassifier>
 ]
   </Classifiers>
 

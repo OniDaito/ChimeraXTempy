@@ -55,12 +55,23 @@ def chimera_to_tempy_atom(atom, serial):
 
   return ta
 
+def chimera_to_tempy_model(model):
+  """ Convert a chimera collection of atoms (model) into a tempy biopy structure """
+  atomlist = []
+  for atom in model.atoms:
+    atomlist.append(chimera_to_tempy_atom(atom, len(atomlist)))
+
+  return BioPy_Structure(atomlist)
+
+
 def chimera_to_tempy_map(cmap):
   """ Convert a Chimera Map into a tempy one """
   
-  apix = 3.0 # TODO - Not sure what this is but will check - step?
+  # ChimeraX allows different steps in all 3 dimensions whereas tempy does
+  # not so we just pick the first. Could lead to future problems
+  apix = cmap.data.step[0]
+  
   origin = cmap.data.origin
- 
   # Grid_Data is the ChimeraX class we are after here
   # TODO - cmap.matrix *should* return a numpy array which is what we are after I *think*
   # Don't know if its actually correct. In both test and here its all zeros (but has a distinct shape)

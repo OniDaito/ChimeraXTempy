@@ -1,6 +1,6 @@
 #!/bin/bash
 # Assuming inside a virtualenv that reflects the ChimeraX lib python site-packages dir
-VERSION=0.0.4
+VERSION=0.0.5
 HOME=/home/oni
 CHIMERAX=/opt/UCSF/chimerax
 rm -rf ./build

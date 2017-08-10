@@ -3,7 +3,7 @@
 Welcome to the ChimeraXTempy bundle plugin. This project combines tempy with ChimeraX for scoring EM fitting.
 
 ## History & Version
-Currently at version 0.0.3
+Currently at version 0.0.5
 
 ## Building
 
