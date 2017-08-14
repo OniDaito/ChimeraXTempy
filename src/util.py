@@ -83,7 +83,4 @@ def chimera_to_tempy_map(cmap):
 
   mt = Map(actual_map, origin, apix, "nofilename") 
 
-
   return mt
-
-

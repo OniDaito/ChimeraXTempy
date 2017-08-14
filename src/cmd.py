@@ -8,7 +8,9 @@ from chimerax.core.commands import StringArg, BoolArg, FloatArg, IntArg, EnumOf,
 from chimerax.core.map.volume import Volume
 from chimerax.core.atomic.structure import AtomicStructure
 
-
+#
+# SCCC Section
+#
 def sccc(session, scoringModel=None, scoringMap=None, rigidFile="rigid.txt", simSigma=0.187, rez=10.0):
   ''' Calculate the sccc score using the parameters above from the command line
   interface. e.g sccc (#1) (#2) rigid.txt . Optional parameters are the sigman and rez.'''
@@ -30,7 +32,9 @@ def register_sccc():
     from chimerax.core.commands import register
     register('sccc', sccc_desc, sccc)
 
-
+#
+# SMOC 
+#
 def smoc(session, scoringModels=None, scoringMap=None, simSigma=0.187, rez=10.0, window=9):
   ''' Calculate the smoc score using the parameters above from the command line
   interface. e.g smoc (#1,#2) (#3). Optional parameters are the sigma, rez and 
@@ -85,7 +89,9 @@ def register_smoc():
     from chimerax.core.commands import register
     register('smoc', smoc_desc, smoc)
 
-
+#
+# NMI
+#
 def nmi(session, scoringMapModel1=None, scoringMapModel2=None, rez1=None, rez2=None, contour1=None, contour2=None):
   ''' Calculate the nmi score using the parameters above from the command line
   interface. e.g nmi (#1) (#2) 6.6 4.0. Optional parameters are the resolutions and contours.'''

@@ -58,7 +58,6 @@ def match_grid(emmap1,emmap2,c1,c2):
   return emmap_1, emmap_2
 
 def score(session, atomic_model1 = None, map_model1 = None, atomic_model2 = None, map_model2 = None, rez1 = None, rez2 = None, c1 = None, c2 = None):
-
   """ Generate the NMI score for 2 maps, 1 map and 1 model or 2 models. """
 
   sc = ScoringFunctions()
@@ -125,7 +124,6 @@ def score(session, atomic_model1 = None, map_model1 = None, atomic_model2 = None
     else:
       emmap1, emmap2 = match_grid(emmap1,emmap2,c1,c2)
  
-      
   nmi = 0.0
 
   try:

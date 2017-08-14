@@ -23,15 +23,10 @@ def model_tree(list_coord1,distpot=3.5,list_coord2=None):
     except ImportError:
         from scipy.spatial import KDTree
         coordtree = KDTree(list_coord12)
-        #if list_coord2 != None: coordtree1 = KDTree(list_coord2)
+    
     if list_coord2 != None: 
         neigh_points = coordtree.query_ball_point(list_coord1,distpot)
-            # use count_neighbors if the corresponding indices are not required
-        #else: 
-        #    neigh_points = coordtree.query_ball_point(coordtree,distpot)
-    #print len(list_coord1), len(neigh_points)
     return neigh_points
-
 
 def score(session, atomic_models, map_model, rigid_filename, sim_sigma=0.187, rez = 10.0, window = 9, colour_atoms=True):
   
@@ -58,16 +53,10 @@ def score(session, atomic_models, map_model, rigid_filename, sim_sigma=0.187, re
     flag_rerun = 0
     it = 0
     dict_reslist = {}
-   
     dict_chains_scores = {}
 
     dict_ch_scores, dict_chain_res = sc.SMOC(bio_map_structure, rez, bio_atom_structure, window, rigid_filename, sim_sigma)
-   
-    # Option to save the rigid file?
-    #if rigid_out:
-    #  dict_chain_indices, dict_chain_CA = blurrer.get_coordinates(structure_instance)
-    #  rigidf = open(rigid_out_prefix+'_'+lab,'w')
-      
+     
     for ch in dict_ch_scores:
       flagch = 1
       dict_res_scores = dict_ch_scores[ch]
@@ -104,7 +93,6 @@ def score(session, atomic_models, map_model, rigid_filename, sim_sigma=0.187, re
         except KeyError: 
           dict_chains_scores[ch][res] = [str(0.0)]
           dict_chains_scores[ch][res][it] = str(curscore)
-      
           
       #calc ratio between current and prev scores
       if it > 0:

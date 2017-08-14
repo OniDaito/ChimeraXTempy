@@ -67,6 +67,8 @@ The SMOC score accepts the *Res.*, *sigma* and *window* parameters. Once you hav
 
 Scores and messages appear in the *log* screen.
 
+The NMI score can be calculated by selecting two models, a model and a map or two maps. Clicking on the the NMI score button will print the resulting score in the *log* screen. The variables for the nmi score include *Res.* *Res.2* (the resolution of the first and second selected items respectively), *c1* and *c2* (the contour values for the first and second selected items respectively).
+
 ### Command-line tools
 Inside ChimeraX with the command line, you can compute the sccc with the following command
 
@@ -78,16 +80,25 @@ Where #1 is the pdb model, #2 is the map. The SMOC is similar:
 
 You can pass in multiple models as the first parameter in order to compare scores.
 
+The NMI score works in the same way
+
+    nmi (#1) (#2) 10 10 6 6
+
+The first two parameters are the selected items. The third and fourth are the resolutions, and the last two, the contours.
+
 ## Testing
 
-The test directory included contains a python test and some sample model and map files for verifying the scoring functions.
+The test directory included contains a python test and some sample model and map files for verifying the scoring functions. These can be run using the command:
+
+    python test_cmd.py
+
+This assumes you have the ChimeraX python modules in your path, as well as TEMPY. The easiest way to to do this is to use VirtualEnv or similar.
 
 ## Tempy
 
 Taken from [http://tempy.ismb.lon.ac.uk http://tempy.ismb.lon.ac.uk] 
 
 "TEMPy is an object-oriented Python library designed to help the user in the analysis of structures of macromolecular assemblies, especially in the context of 3D electron microscopy density maps. It is designed with a set of functionalities that assess the goodness-of-fit between a given atomic model and a density map or between two maps using a variety of different scoring functions.It can also generate various ensembles of alternative fits, which has been shown to be useful in assessing a model fit and find other models with good density fit. In the future, TEMPy will also include a suite of functions for density ﬁtting."
-
 
 ## Credits
 
