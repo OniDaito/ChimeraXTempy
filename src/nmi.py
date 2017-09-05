@@ -8,9 +8,14 @@ from TEMPy.MapParser import MapParser
 from TEMPy.ScoringFunctions import ScoringFunctions
 from TEMPy.StructureParser import PDBParser
 from TEMPy.StructureBlurrer import StructureBlurrer
-import os,sys
 from TEMPy.class_arg import TempyParser
+
 from traceback import print_exc
+import os,sys
+
+from chimerax.core.map.volume import Volume
+from chimerax.core.atomic.structure import AtomicStructure
+
 from .util import chimera_to_tempy_model, chimera_to_tempy_map
 
 #calculate map contour
@@ -57,6 +62,100 @@ def match_grid(emmap1,emmap2,c1,c2):
   del emmap2
   return emmap_1, emmap_2
 
+def score_cmd(session, comparators, compared, rez_comparators, rez_compared, contours_comparators, contour_compared):
+  sc = ScoringFunctions()
+  blurrer = StructureBlurrer()
+
+   # Loop through these to be compared
+  idx = 0
+  scores = []
+  
+  for comparator in comparators:
+    emmap1 = None
+    emmap2 = None
+    
+    if type(comparator) is AtomicStructure:
+      if type(compared) is AtomicStructure:
+        # Both models
+        if None in ([rez_compared] + rez_comparators): 
+          print("Please provide the resolution for all models")
+          return
+       
+        bms1 = chimera_to_tempy_model(compared)
+        bms2 = chimera_to_tempy_model(comparator)
+        emmap1 = model_contour( bms1, rez_compared, emmap=False,t=0.5)
+        
+        if contours_comparators[idx] is None: 
+          emmap2 = model_contour(bms2, rez_comparators[idx],emmap=False,t=0.5)
+        else:
+          emmap2 = blur_model(bms2, rez_comparators[idx], emmap=False)
+     
+      else:
+        # 0 - map, 1 - model
+        if rez_comparators[idx] == None: 
+          print("Please provide the resolution for the model.")
+          return
+
+        emmap1 = chimera_to_tempy_map(compared)
+        bms = chimera_to_tempy_model(comparator)
+        emmap2 = blurrer.gaussian_blur(bms, rez_compared, densMap=emmap1)
+        
+    else:
+      if type(compared) is AtomicStructure:
+        # 0 - model, 1 - map
+        if rez_compared == None: 
+          print("Please provide the resolution for the model.")
+          return
+
+        emmap2 = chimera_to_tempy_map(comparator)
+        bms = chimera_to_tempy_model(compared)
+        emmap1 = blurrer.gaussian_blur(bms, rez_compared, densMap=emmap2)
+
+      else:
+        # 0 - map, 1 - map
+        emmap1 = chimera_to_tempy_map(compared)
+        emmap2 = chimera_to_tempy_map(comparator)
+     
+    c1 = contour_compared
+    # Contouring
+    if c1 == None:
+      c1 = map_contour(emmap1,t=1.5)
+
+    c2 = contours_comparators[idx]
+    # This kinda makes no sense and could be tricky
+    if c2 == None:
+      c2 = map_contour(emmap2,t=1.5)
+
+    # Some kind of fix if the maps don't match?
+    # Resize, resample or blur of somekind
+    if not sc.mapComparison(emmap1,emmap2):
+      emmap1._crop_box(c1,0.5)
+      emmap2._crop_box(c2,0.5)
+      
+      if rez_compared > 1.25*rez_comparators[idx]: 
+        emmap_2 = lpfilter(emmap2,rez_compared)
+        emmap1, emmap2 = match_grid(emmap1,emmap_2,c1,c2)
+      elif rez_comparators[idx] > 1.25*rez_compared:
+        emmap_1 = lpfilter(emmap1,rez_comparators[idx])
+        emmap1, emmap2 = match_grid(emmap_1,emmap2,c1,c2)
+      else:
+        emmap1, emmap2 = match_grid(emmap1,emmap2,c1,c2)
+   
+    nmi = 0.0
+
+    try:
+      nmi = sc.MI(emmap1,emmap2,c1,c2,1,None,None,True)
+      if nmi < 0.0: nmi = 0.0
+    except:
+      print('Exception for NMI score')
+      print_exc()
+      nmi = 0.0
+    scores.append(nmi)
+    idx+=1 
+
+  return scores
+
+
 def score(session, atomic_model1 = None, map_model1 = None, atomic_model2 = None, map_model2 = None, rez1 = None, rez2 = None, c1 = None, c2 = None):
   """ Generate the NMI score for 2 maps, 1 map and 1 model or 2 models. """
 
@@ -94,7 +193,7 @@ def score(session, atomic_model1 = None, map_model1 = None, atomic_model2 = None
 
     emmap1 = model_contour( bms1, rez1, emmap=False,t=0.5)
     if c2 is None: 
-      emmap1 = model_contour(bms2, rez2,emmap=False,t=0.5)
+      emmap2 = model_contour(bms2, rez2,emmap=False,t=0.5)
     else:
       emmap2 = blur_model( bms2, rez2, emmap=False)
  

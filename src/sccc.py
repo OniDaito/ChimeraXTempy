@@ -1,5 +1,4 @@
 # vim: set expandtab shiftwidth=2 softtabstop=2:
-
 # sccc
 #   "score" - compute the sccc score using tempy
 #

@@ -37,7 +37,7 @@ def register_sccc():
 #
 def smoc(session, scoringModels=None, scoringMap=None, simSigma=0.187, rez=10.0, window=9):
   ''' Calculate the smoc score using the parameters above from the command line
-  interface. e.g smoc (#1,#2) (#3). Optional parameters are the sigma, rez and 
+  interface. e.g smoc (#1 #2) (#3). Optional parameters are the sigma, rez and 
   window.'''
   
   from .smoc import score
@@ -90,7 +90,7 @@ def register_smoc():
     register('smoc', smoc_desc, smoc)
 
 #
-# NMI
+# NMI for single items
 #
 def nmi(session, scoringMapModel1=None, scoringMapModel2=None, rez1=None, rez2=None, contour1=None, contour2=None):
   ''' Calculate the nmi score using the parameters above from the command line
@@ -105,7 +105,6 @@ def nmi(session, scoringMapModel1=None, scoringMapModel2=None, rez1=None, rez2=N
   elif isinstance(scoringMapModel1, Volume) and isinstance(scoringMapModel2, AtomicStructure):
     nmi_score = score(session, scoringMapModel2, scoringMapModel1, None, None, rez1, rez2, contour1, contour2 )
   elif isinstance(scoringMapModel1, AtomicStructure) and isinstance(scoringMapModel2, Volume):
-    print("AHA!")
     nmi_score = score(session, scoringMapModel1, scoringMapModel2, None, None,rez1, rez2, contour1, contour2 )
   elif isinstance(scoringMapModel1, Volume) and isinstance(scoringMapModel2, Volume):
     nmi_score = score(session, None, scoringMapModel1, None, scoringMapModel2, rez1, rez2, contour1, contour2 )
@@ -115,8 +114,49 @@ def nmi(session, scoringMapModel1=None, scoringMapModel2=None, rez1=None, rez2=N
     
   print("NMI Score: ", nmi_score)
 
-nmi_desc = CmdDesc(required=[("scoringMapModel1", ModelArg), 
-                          ("scoringMapModel2", ModelArg),],
+#nmi_desc = CmdDesc(required=[("scoringMapModel1", ModelArg), 
+#                          ("scoringMapModel2", ModelArg),],
+#                          optional=[("rez1",FloatArg),
+#                            ("rez2",FloatArg),
+#                            ("contour1",FloatArg),
+#                            ("contour2",FloatArg),],
+#                      keyword=[("log", BoolArg)],
+#                      synopsis="The Tempy NMI function")
+    
+#def register_nmi():
+#    from chimerax.core.commands import register
+#    register('nmi', nmi_desc, nmi)
+
+
+#
+# NMI for multiple objects
+#
+def nmi(session, comparators = None, compared = None, rez1 = None, rez2 = None, contour1 = None, contour2 = None ):
+  ''' Calculate the nmi score using the parameters above from the command line
+  interface. e.g nmi (#1 #2) (#3) 6.6 4.0. Optional parameters are the resolutions and contours.
+  We assume ALL comparators have the same rez and contours.'''
+  
+  from .nmi import score_cmd
+  from PyQt5 import QtWidgets
+
+  nmi_scores = []
+  contour_compared = contour2
+  rez_compared = rez2
+  contours_comparators = []
+  rez_comparators = []
+
+  for c in comparators:
+    rez_comparators.append(rez1)
+    contours_comparators.append(contour1)
+
+  nmi_scores = score_cmd(session, comparators, compared, rez_comparators, rez_compared, contours_comparators, contour_compared)
+
+  if nmi_scores != None: 
+    for nmi_score in nmi_scores:
+      print("NMI Score: ", nmi_score)
+
+nmi_desc = CmdDesc(required=[("comparators", ModelsArg), 
+                          ("compared", ModelArg),],
                           optional=[("rez1",FloatArg),
                             ("rez2",FloatArg),
                             ("contour1",FloatArg),
@@ -127,3 +167,5 @@ nmi_desc = CmdDesc(required=[("scoringMapModel1", ModelArg),
 def register_nmi():
     from chimerax.core.commands import register
     register('nmi', nmi_desc, nmi)
+
+

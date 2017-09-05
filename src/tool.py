@@ -182,10 +182,10 @@ class ToolUI(ToolInstance):
     ''' Take the first two things selected. We will see what they are used
     for later. Used in the NMI scoring.'''
 
-    if len(self.session.selection.models()) >= 2:
+    if len(self.session.selection.models()) == 2:
       return (True, self.session.selection.models()[0], self.session.selection.models()[1])
   
-    print("TEMPY Error: Please select two maps/models.")
+    print("TEMPY Error: Please select two and only two maps/models.")
     return(False,None,None)
 
   def _sccc_score(self):
