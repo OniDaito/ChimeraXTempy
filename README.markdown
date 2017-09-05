@@ -3,7 +3,7 @@
 Welcome to the ChimeraXTempy bundle plugin. This project combines tempy with ChimeraX for scoring EM fitting.
 
 ## History & Version
-Currently at version 0.0.5
+Currently at version 0.1.0
 
 ## Building
 
@@ -68,6 +68,14 @@ The SMOC score accepts the *Res.*, *sigma* and *window* parameters. Once you hav
 Scores and messages appear in the *log* screen.
 
 The NMI score can be calculated by selecting two models, a model and a map or two maps. Clicking on the the NMI score button will print the resulting score in the *log* screen. The variables for the nmi score include *Res.* *Res.2* (the resolution of the first and second selected items respectively), *c1* and *c2* (the contour values for the first and second selected items respectively).
+
+The NMI Command is a little different. You can compare multiple models to a single map, if you make the assumption that *all models have the same resolution and contour values*. The command has the following syntax:
+
+    nmi <models> <map> <models resolution> <map resolution> <models contours> <map contours>
+
+Contours and map resolutions are optional. Here is an example of the command with just resolutions set and no contours:
+
+    nmi (#1 #2) #3 10.0 10.0
 
 ### Command-line tools
 Inside ChimeraX with the command line, you can compute the sccc with the following command
