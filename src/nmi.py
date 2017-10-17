@@ -156,8 +156,9 @@ def score_cmd(session, comparators, compared, rez_comparators, rez_compared, con
   return scores
 
 
+# TODO - simplify this function down a bit
 def score(session, atomic_model1 = None, map_model1 = None, atomic_model2 = None, map_model2 = None, rez1 = None, rez2 = None, c1 = None, c2 = None):
-  """ Generate the NMI score for 2 maps, 1 map and 1 model or 2 models. """
+  """ Generate the NMI score for 2 maps or 1 map and 1 model. """
 
   sc = ScoringFunctions()
  

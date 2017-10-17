@@ -15,7 +15,7 @@ from .util import chimera_to_tempy_atom, chimera_to_tempy_map
 
 import math
 
-def score(session, atomic_model, map_model, rigid_filename, sim_sigma= 0.187,rez = 10.0, colour_atoms=True):
+def score(session, atomic_model, map_model, rigid_filename, rez, sim_sigma= 0.187, colour_atoms=True):
   """ Perform the SCCC score 
   Takes a session, a single model, map, rigid file path and some tuneable 
   optional variables

@@ -3,7 +3,7 @@
 Welcome to the ChimeraXTempy bundle plugin. This project combines tempy with ChimeraX for scoring EM fitting.
 
 ## History & Version
-Currently at version 0.1.0
+Currently at version 0.2.0
 
 ## Building
 
@@ -73,20 +73,22 @@ The NMI Command is a little different. You can compare multiple models to a sing
 
     nmi <models> <map> <models resolution> <map resolution> <models contours> <map contours>
 
-Contours and map resolutions are optional. Here is an example of the command with just resolutions set and no contours:
+Contours are optional. Here is an example of the command with just resolutions set and no contours:
 
     nmi (#1 #2) #3 10.0 10.0
 
 ### Command-line tools
 Inside ChimeraX with the command line, you can compute the sccc with the following command
 
-    sccc (#1) (#2) ~/Projects/ChimeraXTempy/test/rigid_RF.txt
+    sccc (#1) (#2) ~/Projects/ChimeraXTempy/test/rigid_RF.txt 10.0
 
-Where #1 is the pdb model, #2 is the map. The SMOC is similar:
+Where #1 is the pdb model, #2 is the map. A rigid filename and a resolution are also needed.
 
-    smoc (#1,2) (#3)
+The SMOC is similar:
 
-You can pass in multiple models as the first parameter in order to compare scores.
+    smoc (#1,2) (#3) 10
+
+You can pass in multiple models as the first parameter in order to compare scores. The resolution for the map must also be given.
 
 The NMI score works in the same way
 

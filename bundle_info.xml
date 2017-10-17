@@ -1,4 +1,4 @@
-<BundleInfo name="ChimeraX-Tempy" version="0.1.0" package="chimerax.tempy"
+<BundleInfo name="ChimeraX-Tempy" version="0.2.0" package="chimerax.tempy"
   	    minSessionVersion="1" maxSessionVersion="1">
 
   <!-- Additional information about bundle source -->

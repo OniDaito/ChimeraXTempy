@@ -28,9 +28,10 @@ def model_tree(list_coord1,distpot=3.5,list_coord2=None):
         neigh_points = coordtree.query_ball_point(list_coord1,distpot)
     return neigh_points
 
-def score(session, atomic_models, map_model, rigid_filename, sim_sigma=0.187, rez = 10.0, window = 9, colour_atoms=True):
+def score(session, atomic_models, map_model, rigid_filename, rez, sim_sigma=0.187,  window = 9, colour_atoms=True):
   
   # TODO - rigid_filename might be optional?
+  # TODO - this function is too long
 
   sc = ScoringFunctions()
 
