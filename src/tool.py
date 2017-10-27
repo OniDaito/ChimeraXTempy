@@ -22,116 +22,10 @@ import os, math
 class ToolUI(ToolInstance):
 
   def __init__(self, session, tool_name):
-
-    # Standard template stuff
+    ''' Call the special layout function '''
     ToolInstance.__init__(self, session, tool_name)
-    self.display_name = "Tempy"
-  
-    from chimerax.core.ui.gui import MainToolWindow
-    self.tool_window = MainToolWindow(self)
-    self.tool_window.manage(placement="side")
-    parent = self.tool_window.ui_area
-
-    # All the PyQT5 Layout business
-    from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QComboBox, QPushButton
-    from chimerax.core.ui.widgets import HtmlView
-    
-    layout = QVBoxLayout()
-    self.top_layout = layout
-    layout.setContentsMargins(0, 0, 0, 0)
-
-    # Score layouts
-    button_layout = QHBoxLayout()
-    layout.addLayout(button_layout)
-
-    # Scoring 
-    button_sccc = QPushButton("SCCC")
-    button_sccc.clicked.connect(self._sccc_score)
-    button_layout.addWidget(button_sccc)
-   
-    button_smoc = QPushButton("SMOC")
-    button_smoc.clicked.connect(self._smoc_score)
-    button_layout.addWidget(button_smoc)
-    
-    button_nmi = QPushButton("NMI")
-    button_nmi.clicked.connect(self._nmi_score)
-    button_layout.addWidget(button_nmi)
-  
-    # Options for the two scores
-    options_layout = QHBoxLayout()
-    options_layout.setContentsMargins(10, 10, 10, 10)
-
-    layout.addLayout(options_layout)
-
-    label_rez = QLabel("Res.")
-    label_rez2 = QLabel("Res.2")
-    label_sigma = QLabel("Sigma")
-    label_window = QLabel("Window")
-
-    label_c1 = QLabel("c.1")
-    label_c2 = QLabel("c.2")
-    
-    label_rez.setFixedSize(40,30)
-    label_rez2.setFixedSize(40,30)
-    label_c1.setFixedSize(40,30)
-    label_c2.setFixedSize(40,30)
-    label_sigma.setFixedSize(60,30)
-    label_window.setFixedSize(70,30)
-    
-    self._widget_sigma = QLineEdit()
-    self._widget_rez = QLineEdit()
-    self._widget_rez2 = QLineEdit()
-    self._widget_c1 = QLineEdit()
-    self._widget_c2 = QLineEdit()
-    self._widget_window = QLineEdit()
-
-    self._widget_rez.setFixedSize(40,30)
-    self._widget_rez2.setFixedSize(40,30)
-    self._widget_c1.setFixedSize(40,30)
-    self._widget_c2.setFixedSize(40,30)
-    self._widget_sigma.setFixedSize(50,30)
-    self._widget_window.setFixedSize(40,30)
-
-    options_layout.addWidget(label_rez)
-    options_layout.addWidget(self._widget_rez)
-    options_layout.addWidget(label_rez2)
-    options_layout.addWidget(self._widget_rez2)
-    options_layout.addWidget(label_sigma)
-    options_layout.addWidget(self._widget_sigma)
-    options_layout.addWidget(label_window)
-    options_layout.addWidget(self._widget_window)
-    options_layout.addWidget(label_c1)
-    options_layout.addWidget(self._widget_c1)
-    options_layout.addWidget(label_c2)
-    options_layout.addWidget(self._widget_c2)
-
-    self._widget_rez.setText("10.0")
-    self._widget_rez2.setText("10.0")
-    self._widget_c1.setText("10.0")
-    self._widget_c2.setText("10.0")
-
-    self._widget_sigma.setText("0.187")
-    self._widget_window.setText("9")
-
-    # Rigid file
-    rigid_layout = QHBoxLayout()
-    layout.addLayout(rigid_layout)
-
-    button_file = QPushButton("Rigid file")
-    self._widget_rigid_file = QLineEdit()
-    
-    # TODO - remove this eventually
-    self._widget_rigid_file.setText('/home/oni/Projects/ChimeraXTempy/test/rigid_RF.txt')
-
-    button_file.clicked.connect(self._select_rigid_file)
-    rigid_layout.addWidget(button_file)
-    rigid_layout.addWidget(self._widget_rigid_file)
-
-    parent.setLayout(layout)
-
-    # Figures for SMOC
-    self._figure = None
-    self._canvas = None
+    from .tool_layout import layout_main
+    layout_main(self)
 
   def _select_model_map(self):
     ''' Our way of selecting the model and map for scoring.
@@ -197,14 +91,14 @@ class ToolUI(ToolInstance):
     from .sccc import score
 
     # Check rigid score file
-    rb_file = self._widget_rigid_file.text()
+    rb_file = self._widget_rigid_file_sccc.text()
     if not os.path.isfile(rb_file):
       print("TEMPY error: File " + rb_file + " does not exist")
       return
 
     try:
-      sim_sigma = float(self._widget_sigma.text())
-      rez = float(self._widget_rez.text())
+      sim_sigma = float(self._widget_sigma_sccc.text())
+      rez = float(self._widget_rez_sccc.text())
     except:
       print("TEMPY Error: Check the values for rez and sigma")
       return
@@ -223,7 +117,7 @@ class ToolUI(ToolInstance):
 
     # Check Rigid file
     # Optional with smoc
-    rb_file = self._widget_rigid_file.text()
+    rb_file = self._widget_rigid_file_smoc.text()
     if not os.path.isfile(rb_file):
       rb_file =""
 
@@ -234,9 +128,9 @@ class ToolUI(ToolInstance):
   
     # Check the options
     try:
-      sim_sigma = float(self._widget_sigma.text())
-      rez = float(self._widget_rez.text())
-      win = int(float(self._widget_window.text()))
+      sim_sigma = float(self._widget_sigma_smoc.text())
+      rez = float(self._widget_rez_smoc.text())
+      win = int(float(self._widget_window_smoc.text()))
     except:
       print("TEMPY Error: Check the values for rez, sigma and window.")
       return
@@ -329,10 +223,10 @@ class ToolUI(ToolInstance):
     from .nmi import score
 
     try:
-      rez1 = float(self._widget_rez.text())
-      rez2 = float(self._widget_rez2.text())
-      contour1 = float(self._widget_c1.text())
-      contour2 = float(self._widget_c2.text()) 
+      rez1 = float(self._widget_rez_nmi.text())
+      rez2 = float(self._widget_rez2_nmi.text())
+      contour1 = float(self._widget_c1_nmi.text())
+      contour2 = float(self._widget_c2_nmi.text()) 
     except:
       print("TEMPY Error: Check the values for rez1, rez2, c1 and c2")
       return
@@ -351,11 +245,18 @@ class ToolUI(ToolInstance):
         
       print("NMI Score: ", nmi_score)
 
-  def _select_rigid_file(self):
+  def _select_rigid_file_sccc(self):
     from PyQt5.QtWidgets import QFileDialog
     filename = QFileDialog.getOpenFileName(None, 'OpenFile')
     print(filename)
-    self._widget_rigid_file.setText(filename[0])
+    self._widget_rigid_file_sccc.setText(filename[0])
+
+  def _select_rigid_file_smoc(self):
+    from PyQt5.QtWidgets import QFileDialog
+    filename = QFileDialog.getOpenFileName(None, 'OpenFile')
+    print(filename)
+    self._widget_rigid_file_smoc.setText(filename[0])
+
 
   def _html_view(self):
     print("HTML Test")
