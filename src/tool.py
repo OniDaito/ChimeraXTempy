@@ -42,6 +42,10 @@ class ToolUI(ToolInstance):
     the scores below the tool.'''
     tool_scores.smoc_score(self)
 
+  def _ccc_score(self):
+    ''' Computer the CCC score.'''
+    tool_scores.ccc_score(self)
+
   def _nmi_score(self):
     ''' Run the nmi score, printing to the log'''
     tool_scores.nmi_score(self) 

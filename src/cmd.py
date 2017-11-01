@@ -11,13 +11,12 @@ from chimerax.core.atomic.structure import AtomicStructure
 #
 # SCCC Section
 #
-def sccc(session, scoringModel=None, scoringMap=None, rigidFile="rigid.txt", simSigma=0.187, rez=10.0):
+def sccc(session, scoringModel=None, scoringMap=None, rigidFile="none", rez=10.0, simSigma=0.187 ):
   ''' Calculate the sccc score using the parameters above from the command line
-  interface. e.g sccc (#1) (#2) rigid.txt 10.0. Optional parameters are the sigman and rez.'''
+  interface. e.g sccc (#1) (#2) rigid.txt 10.0. Optional parameters are the sigma.'''
   
   from .sccc import score
   score(session, scoringModel, scoringMap, rigidFile, rez, simSigma)
-
   
 sccc_desc = CmdDesc(required=[("scoringModel", ModelArg), 
                           ("scoringMap", ModelArg),
@@ -26,17 +25,37 @@ sccc_desc = CmdDesc(required=[("scoringModel", ModelArg),
                       keyword=[("log", BoolArg)],
                       synopsis="The Tempy SCCC function")
     
-
 def register_sccc():
     from chimerax.core.commands import register
     register('sccc', sccc_desc, sccc)
 
 #
+# CCC Section
+#
+def ccc(session, scoringModel=None, scoringMap=None, rez=10.0):
+  ''' Calculate the sccc score using the parameters above from the command line
+  interface. e.g ccc (#1) (#2) 10.0'''
+  
+  from .ccc import score
+  score(session, scoringModel, scoringMap, rez)
+
+ccc_desc = CmdDesc(required=[("scoringModel", ModelArg), 
+                          ("scoringMap", ModelArg),
+                          ("rez",FloatArg)],
+                      keyword=[("log", BoolArg)],
+                      synopsis="The Tempy CCC function")
+    
+def register_ccc():
+    from chimerax.core.commands import register
+    register('ccc', ccc_desc, ccc)
+
+
+#
 # SMOC 
 #
-def smoc(session, scoringModels, scoringMap, rez, simSigma=0.187, window=9):
+def smoc(session, scoringModels=None, scoringMap=None, rez=10.0, simSigma=0.187, window=9):
   ''' Calculate the smoc score using the parameters above from the command line
-  interface. e.g smoc (#1 #2) (#3). Optional parameters are the sigma, rez and 
+  interface. e.g smoc (#1 #2) (#3). Optional parameters are the sigma and 
   window.'''
   
   from .smoc import score

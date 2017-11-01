@@ -3,7 +3,7 @@
 Welcome to the ChimeraXTempy bundle plugin. This project combines tempy with ChimeraX for scoring EM fitting.
 
 ## History & Version
-Currently at version 0.2.0
+Currently at version 0.3.0
 
 ## Building
 
@@ -77,6 +77,13 @@ Contours are optional. Here is an example of the command with just resolutions s
 
     nmi (#1 #2) #3 10.0 10.0
 
+The CCC score is fairly simple. It take a model, a map and a resolution
+
+    ccc (#1) (#2) 10.0
+
+The tab for CCC takes the resolution parameter. With a map and model selected, simply press the CCC button.
+
+
 ### Command-line tools
 Inside ChimeraX with the command line, you can compute the sccc with the following command
 
@@ -95,6 +102,12 @@ The NMI score works in the same way
     nmi (#1) (#2) 10 10 6 6
 
 The first two parameters are the selected items. The third and fourth are the resolutions, and the last two, the contours.
+
+CCC is the simplest:
+
+    ccc (#1) (#2) 10.0
+
+It takes a map, a model and a resolution.
 
 ## Testing
 

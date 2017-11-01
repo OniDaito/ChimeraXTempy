@@ -34,7 +34,6 @@ def score(session, atomic_models, map_model, rigid_filename, rez, sim_sigma=0.18
   # TODO - this function is too long
 
   sc = ScoringFunctions()
-
   rvals = []
   
   for atomic_model in atomic_models:
@@ -45,7 +44,6 @@ def score(session, atomic_models, map_model, rigid_filename, rez, sim_sigma=0.18
     
     bio_atom_structure = BioPy_Structure(atomlist)
     bio_map_structure = chimera_to_tempy_map(map_model)
-
     slow = 0.50
     shigh = 0.25 # fraction of structure fitted reasonably well initially
     list_zscores = []
@@ -55,7 +53,6 @@ def score(session, atomic_models, map_model, rigid_filename, rez, sim_sigma=0.18
     it = 0
     dict_reslist = {}
     dict_chains_scores = {}
-
     dict_ch_scores, dict_chain_res = sc.SMOC(bio_map_structure, rez, bio_atom_structure, window, rigid_filename, sim_sigma)
      
     for ch in dict_ch_scores:

@@ -218,6 +218,33 @@ def layout_smoc(tool, tab):
   button_smoc.clicked.connect(tool._smoc_score)
   tool.smoc_layout.addWidget(button_smoc)
 
+def layout_ccc(tool, tab):
+  ''' Layout the ccc tab '''
+  layout = QVBoxLayout()
+  tool.ccc_layout = layout
+  layout.setContentsMargins(0, 0, 0, 0)
+  tab.setLayout(layout)
+  layout.setSpacing(5)
+  layout.setAlignment(QtCore.Qt.AlignTop)
+
+  params_layout = QHBoxLayout()
+  params_layout.setContentsMargins(0, 5, 0, 5)
+  layout.addLayout(params_layout)
+  
+  label_rez = QLabel("Resolution.")
+  label_rez.setFixedSize(90,30)
+
+  tool._widget_rez_ccc = QLineEdit()
+  tool._widget_rez_ccc.setFixedSize(40,30)
+  
+  params_layout.addWidget(label_rez)
+  params_layout.addWidget(tool._widget_rez_ccc)
+
+  tool._widget_rez_smoc.setText("10.0")
+
+  button_ccc = QPushButton("CCC")
+  button_ccc.clicked.connect(tool._ccc_score)
+  tool.ccc_layout.addWidget(button_ccc)
 
 def layout_main(tool):
   # Standard template stuff 
@@ -248,6 +275,12 @@ def layout_main(tool):
   tab_sccc.setSizePolicy(policy)
   tab_widget.addTab(tab_sccc, "SCCC")
 
+  tab_ccc = QWidget()
+  tab_ccc.setMinimumHeight(210) 
+  tab_ccc.setMinimumWidth(400)
+  tab_ccc.setSizePolicy(policy)
+  tab_widget.addTab(tab_ccc, "CCC")
+
   tab_nmi = QWidget()
   tab_nmi.setMinimumHeight(210) 
   tab_nmi.setMinimumWidth(400)
@@ -258,7 +291,8 @@ def layout_main(tool):
   layout_nmi(tool, tab_nmi)
   layout_sccc(tool, tab_sccc)
   layout_smoc(tool, tab_smoc)
-
+  layout_ccc(tool, tab_ccc)
+  
   parent.setLayout(layout)
   layout.addWidget(tab_widget)
 

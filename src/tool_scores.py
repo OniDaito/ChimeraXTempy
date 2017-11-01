@@ -102,6 +102,27 @@ def smoc_score(toptool):
   # refresh canvas
   toptool._canvas.draw()
 
+def ccc_score(toptool):
+  ''' Check all the variables and perform the CCC score, creating
+  the corresponding graph in the master tool.'''
+  from .ccc import score
+  from PyQt5.QtWidgets import QVBoxLayout
+
+  # Check model and map
+  result, atomic_model, map_model = tool_select.select_model_map(toptool)    
+  if not result:
+    toptool._show_error("Check that one map and model are selected")
+    return
+
+  # Check the options
+  try:
+    rez = float(toptool._widget_rez_ccc.text())
+  except:
+    toptool._show_error("Check the value for rez.")
+    return
+
+  score = score(toptool.session, atomic_model, map_model, rez)
+
 def sccc_score(toptool):
   ''' Run the sccc score as a graphical function, 
   setting the colours of the chosen model.'''
@@ -130,7 +151,6 @@ def sccc_score(toptool):
     toptool._current_sccc_scores = scores
     toptool._scored_models_sccc = atomic_model
  
-
 def nmi_score(toptool):
   ''' Run the nmi score, printing to the log'''
   from .nmi import score
@@ -181,5 +201,3 @@ def nmi_score(toptool):
       return
       
     print("NMI Score: ", nmi_score)
-
-

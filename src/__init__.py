@@ -34,4 +34,8 @@ class _MyAPI(BundleAPI):
       from . import cmd
       cmd.register_nmi()
     
+    if command_name == "ccc":
+      from . import cmd
+      cmd.register_ccc()
+    
 bundle_api = _MyAPI()
