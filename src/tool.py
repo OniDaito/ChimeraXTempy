@@ -18,14 +18,14 @@ from matplotlib.backends.backend_qt5agg import FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 import os, math 
+from . import tool_layout
 
 class ToolUI(ToolInstance):
 
   def __init__(self, session, tool_name):
     ''' Call the special layout function '''
     ToolInstance.__init__(self, session, tool_name)
-    from .tool_layout import layout_main
-    layout_main(self)
+    tool_layout.layout_main(self)
 
   def _select_model_map(self):
     ''' Our way of selecting the model and map for scoring.
@@ -237,6 +237,10 @@ class ToolUI(ToolInstance):
     if result:
       if isinstance(scoringMapModel1, Volume) and isinstance(scoringMapModel2, AtomicStructure):
         nmi_score = score(self.session, scoringMapModel2, scoringMapModel1, None, None, rez1, rez2, contour1, contour2 )
+      
+      elif isinstance(scoringMapModel2, Volume) and isinstance(scoringMapModel1, AtomicStructure):
+        nmi_score = score(self.session, scoringMapModel1, scoringMapModel2, None, None, rez1, rez2, contour1, contour2 )
+      
       elif isinstance(scoringMapModel1, Volume) and isinstance(scoringMapModel2, Volume):
         nmi_score = score(self.session, None, scoringMapModel1, None, scoringMapModel2, rez1, rez2, contour1, contour2 )
       else :
