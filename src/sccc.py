@@ -47,8 +47,6 @@ def score(session, atomic_model, map_model, rigid_filename, rez, sim_sigma= 0.18
     print("Error in reading Model and Map. Make sure you have selected one model and one map, and the rigid file is correct.")
     return
 
-  SCCC_list_structure_instance=[]
-
   # score each rigid body segment
   listsc_sccc = []
   print('calculating SCCC')
@@ -57,13 +55,13 @@ def score(session, atomic_model, map_model, rigid_filename, rez, sim_sigma= 0.18
     # sccc score
 
     score_SCCC=scorer.SCCC(bio_map_structure, rez, sim_sigma, bio_atom_structure, RB, c_mode=False)
-    SCCC_list_structure_instance.append(score_SCCC)
 
     print ('>>', score_SCCC)
-    listsc_sccc.append(score_SCCC)
+    listsc_sccc.append((RB,score_SCCC))
     
     # Colour the atoms based on the rating from white (1.0) to red (0.0)
     # TODO - maybe a faster way? Also 'all_atoms' mentioned in the API doesnt exist but atoms does! :S
+    # TODO - move this to somewhere better maybe?
     if colour_atoms:
       dr = 255
       dg = 255
@@ -86,3 +84,5 @@ def score(session, atomic_model, map_model, rigid_filename, rez, sim_sigma= 0.18
         for catm in cr.atoms:
           catm.color = [dr,dg,db,255] 
         cr.ribbon_color = [dr,dg,db,255]
+  
+  return listsc_sccc 

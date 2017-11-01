@@ -3,17 +3,29 @@
 # tool_layout.py
 # An additional file to perform the QT layout a little more neatly
 
-from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QComboBox, QPushButton, QWidget, QTabWidget, QSizePolicy
+from PyQt5.QtWidgets import QLineEdit, QVBoxLayout, QHBoxLayout, QGridLayout, QLabel, QComboBox, QPushButton, QWidget, QTabWidget, QSizePolicy, QCheckBox, QListWidget
 
 from PyQt5 import QtCore
 
 from chimerax.core.ui.gui import MainToolWindow
 
+def _adv_clicked(tool):
+  ''' A closure for our advanced options checkbox.'''
+  def _on_clicked(state):
+    if state == QtCore.Qt.Checked:
+      tool._widget_c1_nmi.setEnabled(True)
+      tool._widget_c2_nmi.setEnabled(True)
+    else:
+      tool._widget_c1_nmi.setEnabled(False)
+      tool._widget_c2_nmi.setEnabled(False)  
+  return _on_clicked
+
+
 def layout_nmi(tool, tab):
   ''' Layout the nmi tab '''
   layout = QVBoxLayout()
   tool.nmi_layout = layout
-  layout.setContentsMargins(0, 0, 0, 0)
+  layout.setContentsMargins(0, 5, 0, 5)
   tab.setLayout(layout)
   layout.setSpacing(5)
   layout.setAlignment(QtCore.Qt.AlignTop)
@@ -21,45 +33,77 @@ def layout_nmi(tool, tab):
   params_layout = QHBoxLayout()
   layout.addLayout(params_layout)
   params_layout2 = QHBoxLayout()
-  layout.addLayout(params_layout2)
+
  
-  button_nmi = QPushButton("NMI")
-  button_nmi.clicked.connect(tool._nmi_score)
-  tool.nmi_layout.addWidget(button_nmi)
-  
-  label_rez = QLabel("Resolution.1")
+  label_rez1 = QLabel("Resolution.1")
   label_rez2 = QLabel("Resolution.2")
   label_c1 = QLabel("contour.1")
-  label_c2 = QLabel("conour.2")
+  label_c2 = QLabel("contour.2")
   
-  label_rez.setFixedSize(120,30)
+  label_rez1.setFixedSize(120,30)
   label_rez2.setFixedSize(120,30)
-  label_c1.setFixedSize(60,30)
-  label_c2.setFixedSize(60,30)
+  label_c1.setFixedSize(120,30)
+  label_c2.setFixedSize(120,30)
   
-  tool._widget_rez_nmi = QLineEdit()
+  tool._widget_rez1_nmi = QLineEdit()
   tool._widget_rez2_nmi = QLineEdit()
   tool._widget_c1_nmi = QLineEdit()
   tool._widget_c2_nmi = QLineEdit()
+  
+  adv_box = QCheckBox("Advanced Options")
+  ac = _adv_clicked(tool)
+  adv_box.stateChanged.connect(ac)
+  tool._widget_c1_nmi.setEnabled(False)
+  tool._widget_c2_nmi.setEnabled(False)
 
-  tool._widget_rez_nmi.setFixedSize(40,30)
+  tool._widget_rez1_nmi.setFixedSize(40,30)
   tool._widget_rez2_nmi.setFixedSize(40,30)
   tool._widget_c1_nmi.setFixedSize(40,30)
   tool._widget_c2_nmi.setFixedSize(40,30)
 
-  params_layout.addWidget(label_rez)
-  params_layout.addWidget(tool._widget_rez_nmi)
+  params_layout.addWidget(label_rez1)
+  params_layout.addWidget(tool._widget_rez1_nmi)
   params_layout.addWidget(label_rez2)
   params_layout.addWidget(tool._widget_rez2_nmi)
+ 
+  layout.addWidget(adv_box)
+
+  layout.addLayout(params_layout2)
   params_layout2.addWidget(label_c1)
   params_layout2.addWidget(tool._widget_c1_nmi)
   params_layout2.addWidget(label_c2)
   params_layout2.addWidget(tool._widget_c2_nmi)
 
-  tool._widget_rez_nmi.setText("10.0")
+  tool._widget_rez1_nmi.setText("10.0")
   tool._widget_rez2_nmi.setText("10.0")
-  tool._widget_c1_nmi.setText("10.0")
-  tool._widget_c2_nmi.setText("10.0")
+  tool._widget_c1_nmi.setText("")
+  tool._widget_c2_nmi.setText("")
+ 
+  button_nmi = QPushButton("NMI")
+  button_nmi.clicked.connect(tool._nmi_score)
+  tool.nmi_layout.addWidget(button_nmi)
+
+def _sccc_scores_clicked(toptool):
+  ''' A little closure over the tool in question.'''
+  def clicked(item):
+    idx = toptool._sccc_scores_widget.currentRow()
+    RB, score = toptool._current_sccc_scores[idx]
+    atomic_model = toptool._scored_models_sccc
+    
+    toptool.session.selection.clear()
+    for atom in RB.get_atom_list():
+      sres = atomic_model.residues[atom.res_no]
+      # Duplicate work here but who cares
+      for atom in sres.atoms:
+        atom.selected = True
+   
+  return clicked
+
+def add_sccc_scores(tool, scores):
+  ''' When we have scores, clear existing and add new ones.'''
+  tool._sccc_scores_widget.clear()
+  for RB,score in scores:
+    tool._sccc_scores_widget.addItem(str(RB) + ": " + str(score))
 
 def layout_sccc(tool, tab):
   ''' Layout the sccc tab '''
@@ -112,6 +156,12 @@ def layout_sccc(tool, tab):
   button_sccc = QPushButton("SCCC")
   button_sccc.clicked.connect(tool._sccc_score)
   tool.sccc_layout.addWidget(button_sccc)
+
+  list_scores = QListWidget()
+  tool.sccc_layout.addWidget(list_scores)
+  tool._sccc_scores_widget = list_scores
+  list_scores.show()
+  list_scores.clicked.connect(_sccc_scores_clicked(tool))
 
 def layout_smoc(tool, tab):
   ''' Layout the smoc tab '''
