@@ -411,11 +411,11 @@ class TestCCC(unittest.TestCase):
     emmap2 = blurrer.gaussian_blur_real_space(structure_instance, res, sigma_coeff=0.187, densMap=emmap1, normalise=True) 
    
     # calculate model contour - emmap1 apparently?
-    c2 = mt * emmap1.std()
-    
+    c2 = mt * emmap2.std()
+
     sc = ScoringFunctions()
-    _, ovr = sc.CCC_map(emmap1, emmap2, c1, c2, 3)
-    ccc, _ = sc.CCC_map(emmap1, emmap2, c1, c2)
+    _, ovr = sc.CCC_map(emmap1, emmap2, c1, c2, 3, cmode=False)
+    ccc, _ = sc.CCC_map(emmap1, emmap2, c1, c2, cmode=False)
 
     print ("Printing CCC", ccc,  ovr, c1, c2)
 
@@ -426,14 +426,14 @@ class TestCCC(unittest.TestCase):
     ccc, ovr = self._ccc("emd_2677.map", "4upc.pdb", 4.5)
 
     self.assertTrue(abs(round(ccc,5) - 0.2235) < 0.001 )
-    self.assertTrue(abs(round(ovr,5) - 0.2408) < 0.001 ) 
+    self.assertTrue(abs(round(ovr,5) - 0.4418) < 0.001 ) 
 
   def test_tempy_ccc2(self):
   
     ccc, ovr = self._ccc("1akeA_10A.mrc", "final1_mdcg.pdb", 4.5)
 
-    self.assertTrue(abs(round(ccc,5) - 0.7869) < 0.001 )
-    self.assertTrue(abs(round(ovr,5) - 0.9690) < 0.001 ) 
+    self.assertTrue(abs(round(ccc,5) - 0.7960) < 0.001 )
+    self.assertTrue(abs(round(ovr,5) - 0.9659) < 0.001 ) 
 
 
 
