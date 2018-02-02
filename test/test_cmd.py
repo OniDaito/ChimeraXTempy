@@ -14,7 +14,6 @@ sys.path.insert(0, "../TEMPy")
 from TEMPy.StructureParser import PDBParser
 from TEMPy.MapParser import MapParser
 from TEMPy.RigidBodyParser import RBParser
-from TEMPy.ShowPlot import Plot
 from TEMPy.ScoringFunctions import ScoringFunctions
 from TEMPy.class_arg import TempyParser
 from TEMPy.StructureBlurrer import StructureBlurrer
@@ -370,6 +369,73 @@ class TestNMI(unittest.TestCase):
       nmi = 0.0
   
     self.assertTrue(abs(round(nmi,5) - 1.0575) < 0.001) 
+
+#calculate model contour
+def model_contour(p,res=4.0,emmap=False,t=-1.):
+  pName,modelmap = blur_model(p,res,emmap)
+  c1 = None
+  if t != -1.0:
+    #print 'calculating contour'
+    c1 = t*emmap.std()#0.0
+  return pName,modelmap,c1
+
+
+class TestCCC(unittest.TestCase):
+  def setUp(self):
+    pass
+
+  def tearDown(self):
+    pass
+
+  def _ccc(self, mapname, modelname, res):
+    path_test = "./"
+    m = os.path.join(path_test,mapname)
+    emmap1 = MapParser.readMRC(m)
+    p = os.path.join(path_test,modelname)
+    structure_instance=PDBParser.read_PDB_file('pdbfile', p, hetatm=False, water=False)
+    blurrer = StructureBlurrer()
+    
+    t = 1.5
+    c1 = None
+    c2 = None
+    #calculate map contour
+    zeropeak,ave,sigma1 = emmap1._peak_density()
+    if not zeropeak is None: c1 = zeropeak+(t*sigma1) 
+ 
+    mt = 0.1
+    if res > 20.0: mt = 2.0
+    elif res > 10.0: mt = 1.0
+    elif res > 6.0: mt = 0.5
+  
+    #emmap2 = blurrer.gaussian_blur(structure_instance, res, densMap=emmap1) 
+    emmap2 = blurrer.gaussian_blur_real_space(structure_instance, res, sigma_coeff=0.187, densMap=emmap1, normalise=True) 
+   
+    # calculate model contour - emmap1 apparently?
+    c2 = mt * emmap2.std()
+
+    sc = ScoringFunctions()
+    _, ovr = sc.CCC_map(emmap1, emmap2, c1, c2, 3, cmode=False)
+    ccc, _ = sc.CCC_map(emmap1, emmap2, c1, c2, cmode=False)
+
+    print ("Printing CCC", ccc,  ovr, c1, c2)
+
+    return (ccc, ovr)
+
+  def test_tempy_ccc(self):
+  
+    ccc, ovr = self._ccc("emd_2677.map", "4upc.pdb", 4.5)
+
+    self.assertTrue(abs(round(ccc,5) - 0.2235) < 0.001 )
+    self.assertTrue(abs(round(ovr,5) - 0.4418) < 0.001 ) 
+
+  def test_tempy_ccc2(self):
+  
+    ccc, ovr = self._ccc("1akeA_10A.mrc", "final1_mdcg.pdb", 4.5)
+
+    self.assertTrue(abs(round(ccc,5) - 0.7960) < 0.001 )
+    self.assertTrue(abs(round(ovr,5) - 0.9659) < 0.001 ) 
+
+
 
 if __name__ == '__main__':
   unittest.main()
