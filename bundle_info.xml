@@ -1,4 +1,4 @@
-<BundleInfo name="ChimeraX-Tempy" version="0.3.0" package="chimerax.tempy"
+<BundleInfo name="ChimeraX-Tempy" version="0.4.0" package="chimerax.tempy"
   	    minSessionVersion="1" maxSessionVersion="1">
 
   <!-- Additional information about bundle source -->
@@ -45,12 +45,15 @@
     <PythonClassifier>License :: Free for non-commercial use</PythonClassifier>
     <ChimeraXClassifier>ChimeraX :: Tool :: Tempy :: General :: Show the Tempy options</ChimeraXClassifier>
     <ChimeraXClassifier>ChimeraX :: Command :: sccc :: General :: Calculate the SCCC with Tempy</ChimeraXClassifier>
-]
+
     <ChimeraXClassifier>ChimeraX :: Command :: smoc :: General :: Calculate the SMOC with Tempy</ChimeraXClassifier>
-    ]
+
     <ChimeraXClassifier>ChimeraX :: Command :: nmi :: General :: Calculate the NMI with Tempy</ChimeraXClassifier>
-]   <ChimeraXClassifier>ChimeraX :: Command :: ccc :: General :: Calculate the CCC with Tempy</ChimeraXClassifier>
-]
+   <ChimeraXClassifier>ChimeraX :: Command :: ccc :: General :: Calculate the CCC with Tempy</ChimeraXClassifier>
+
+ <ChimeraXClassifier>ChimeraX :: Command :: difmap :: General :: Generate difference maps with Tempy</ChimeraXClassifier>
+
+
   </Classifiers>
 
 </BundleInfo>

@@ -2468,15 +2468,19 @@ class Map:
         xorigin = float32(self.origin[0])
         yorigin = float32(self.origin[1])
         zorigin = float32(self.origin[2])
-        mapword = 'MAP '
+        mapword = b'MAP '
         if sys.byteorder == 'little':
             byteorder = 0x44440000
         else:
             byteorder = 0x11110000
         rms = float32(self.std())
         nlabels = int32(1)
-        label0 = 'Created by TEMpy on: ' + str(datetime.date.today()) + zeros(49).tostring()
-        otherlabels = zeros(90).tostring()
+      
+
+        label0 = "Created by TEMpy on: " + str(datetime.date.today()) + str(zeros(49).tostring())
+        otherlabels = str(zeros(90).tostring())
+        label0 = str.encode(label0)
+        otherlabels = str.encode(otherlabels)
 
         fm_string = '=10l6f3l3f2l100s3f4slfl80s720s'
         packed = binary.pack(fm_string, nx, ny, nz, mode, nxstart, nystart, nzstart, mx, my, mz, xlen, ylen, zlen, alpha, beta, gamma,\

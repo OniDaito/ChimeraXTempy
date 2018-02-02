@@ -38,4 +38,8 @@ class _MyAPI(BundleAPI):
       from . import cmd
       cmd.register_ccc()
     
+    if command_name == "difmap":
+      from . import cmd
+      cmd.register_difmap()
+
 bundle_api = _MyAPI()

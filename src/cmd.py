@@ -142,6 +142,31 @@ def nmi(session, scoringMapModel1=None, scoringMapModel2=None, rez1=None, rez2=N
 
 
 #
+# difmap for two maps
+#
+def difmap(session, map0 = None, map1 = None, rez1 = None, rez2 = None, contour1 = None, contour2 = None ):
+  ''' Calculate the nmi score using the parameters above from the command line
+  interface. e.g difmap (#1) (#2) 10 10'''
+  
+  from .difmap import genmap
+  from PyQt5 import QtWidgets
+
+  genmap(session, map0, map1, rez1, rez2, contour1, contour2)
+
+difmap_desc = CmdDesc(required=[("map0", ModelArg), 
+                          ("map1", ModelArg),("rez1",FloatArg),
+                            ("rez2",FloatArg),],
+                          optional=[
+                            ("contour1",FloatArg),
+                            ("contour2",FloatArg),],
+                      keyword=[("log", BoolArg)],
+                      synopsis="The Tempy difmap function")
+    
+def register_difmap():
+    from chimerax.core.commands import register
+    register('difmap', difmap_desc, difmap)
+
+#
 # NMI for multiple objects
 #
 def nmi(session, comparators = None, compared = None, rez1 = None, rez2 = None, contour1 = None, contour2 = None ):
