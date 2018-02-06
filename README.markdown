@@ -3,7 +3,7 @@
 Welcome to the ChimeraXTempy bundle plugin. This project combines tempy with ChimeraX for scoring EM fitting.
 
 ## History & Version
-Currently at version 0.3.0
+Currently at version 0.5.0
 
 ## Building
 
@@ -83,6 +83,7 @@ The CCC score is fairly simple. It take a model, a map and a resolution
 
 The tab for CCC takes the resolution parameter. With a map and model selected, simply press the CCC button.
 
+Generating difference maps is also possible from the DIFMAP menu. Select two maps and provide the required resolutions (and optional contours). Two new maps will be created and added to the model list.
 
 ### Command-line tools
 Inside ChimeraX with the command line, you can compute the sccc with the following command
@@ -108,6 +109,12 @@ CCC is the simplest:
     ccc (#1) (#2) 10.0
 
 It takes a map, a model and a resolution.
+
+Generating a difference map requires two maps:
+
+    difmap (#1) (#2) 23.5 14.9 0.1 0.07
+
+The first two parameters are the maps in question. Parameters 3 and 4 are the resolutions of each map and are required. The last two paramters are the map contours and are optional.
 
 ## Testing
 

@@ -82,30 +82,27 @@ def chimera_to_tempy_map(cmap):
   # TODO - cmap.matrix *should* return a numpy array which is what we are after I *think*
   # Don't know if its actually correct. In both test and here its all zeros (but has a distinct shape)
   actual_map = cmap.matrix()
- 
+
   # I still can't find the actual map data but this seems to work for now
   #tstep = (int(d.data_step[0]),int(d.data_step[1]),int(d.data_step[2]))    
   #mmm = mrc_data.read_matrix((0,0,0), d.data_size, tstep, None)
 
   mt = Map(actual_map, origin, apix, "nofilename") 
-  print(mt.fullMap)
-  print(dir(mt))
-
   return mt
 
 def tempy_to_chimera_map(session, cmap):
   """ Convert a Tempy Map into a Chimera one """
-  # data is an MRC_Grid object
-
-  print(dir(cmap))
+  # data is an MRC_Grid object - couldnt make it work 
+  # so I came up with my own GridDataMem based class that
+  # reads from memory instead.
 
   class Grid_Data_Mem (Grid_Data):
-    def __init__(self, m, size, origin):
+    def __init__(self, m, size, origin, apix):
       super(Grid_Data_Mem, self).__init__(
           size,
           value_type = float32,
-          origin = (0,0,0),
-          step = (1,1,1),
+          origin = origin,
+          step = (apix,apix,apix),
           cell_angles = (90,90,90),
           rotation = ((1,0,0),(0,1,0),(0,0,1)),
           symmetries = None,
@@ -118,40 +115,18 @@ def tempy_to_chimera_map(session, cmap):
           channel = None)
 
       self.data = m.getMap()
+      self.apix = apix
 
     def read_matrix(self, ijk_origin, ijk_size, ijk_step, progress):
       return self.data 
       #return self.mrc_data.read_matrix(ijk_origin, ijk_size, ijk_step, progress)
 
+  origin = (cmap.x_origin(), cmap.y_origin(), cmap.z_origin())
 
   # TODO - is box_size the right size? Maybe map size?
-  dmap = Grid_Data_Mem(cmap, cmap.box_size(), origin=(cmap.x_origin(), cmap.y_origin(), cmap.z_origin()))
+  dmap = Grid_Data_Mem(cmap, cmap.box_size(), origin, cmap.apix)
   #dmap.cache_data(cmap.fullMap,(cmap.x_origin, cmap.y_origin, cmap.z_origin),cmap.box_size(),cmap.apix)
-  dmap.cache_data(cmap.getMap(),(0,0,0),None,(1.0,1.0,1.0))
+  dmap.cache_data(cmap.getMap(),origin,None,cmap.apix)
 
-  #data.crs_to_ijk = crs_to_ijk
-  #data.ijk_to_crs = ijk_to_crs
-  #data.matrix_size = [int(s) for s in crs_size]
-  #data.data_size = [int(crs_size[a]) for a in ijk_to_crs]
-
-  #data.unit_cell_size = mx, my, mz = v['mx'], v['my'], v['mz']
-
-  #data.data_origin = (v['xorigin'], v['yorigin'], v['zorigin'])
-  #data.rotation = r
-    
-  #data.min_intensity = v['amin']
-  #data.max_intensity = v['amax']
-
-  #data.cell_angles = (alpha, beta, gamma)
-  #data.data_step = (1.0, 1.0, 1.0)
-  #data.step = []
-  #data.step.append(cmap.apix)
-  #data.origin = cmap.origin
-  #data.matrix = 
-  # Grid_Data is the ChimeraX class we are after here
-  # TODO - cmap.matrix *should* return a numpy array which is what we are after I *think*
-  # Don't know if its actually correct. In both test and here its all zeros (but has a distinct shape)
-  #actual_map = cmap.matrix()
- 
   nm = Volume(dmap, session)
   return nm

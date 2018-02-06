@@ -53,7 +53,6 @@ def score(session, atomic_model, map_model, rigid_filename, rez, sim_sigma= 0.18
 
   for RB in listRB:
     # sccc score
-
     score_SCCC=scorer.SCCC(bio_map_structure, rez, sim_sigma, bio_atom_structure, RB, c_mode=False)
 
     print ('>>', score_SCCC)
@@ -72,7 +71,6 @@ def score(session, atomic_model, map_model, rigid_filename, rez, sim_sigma= 0.18
       else:
         db = int(math.floor(255 * (score_SCCC * 2.0)))
         dg = db
-
 
       residues = []
       for a in RB.atomList:

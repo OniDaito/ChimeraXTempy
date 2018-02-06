@@ -20,6 +20,17 @@ def _adv_clicked(tool):
       tool._widget_c2_nmi.setEnabled(False)  
   return _on_clicked
 
+def _adv_dif_clicked(tool):
+  ''' A closure for our advanced options checkbox.'''
+  def _on_clicked(state):
+    if state == QtCore.Qt.Checked:
+      tool._widget_c1_dif.setEnabled(True)
+      tool._widget_c2_dif.setEnabled(True)
+    else:
+      tool._widget_c1_dif.setEnabled(False)
+      tool._widget_c2_dif.setEnabled(False)  
+  return _on_clicked
+
 
 def layout_nmi(tool, tab):
   ''' Layout the nmi tab '''
@@ -82,6 +93,67 @@ def layout_nmi(tool, tab):
   button_nmi = QPushButton("NMI")
   button_nmi.clicked.connect(tool._nmi_score)
   tool.nmi_layout.addWidget(button_nmi)
+
+def layout_dif(tool, tab):
+  ''' Layout the difmap tab '''
+  layout = QVBoxLayout()
+  tool.dif_layout = layout
+  layout.setContentsMargins(0, 5, 0, 5)
+  tab.setLayout(layout)
+  layout.setSpacing(5)
+  layout.setAlignment(QtCore.Qt.AlignTop)
+ 
+  params_layout = QHBoxLayout()
+  layout.addLayout(params_layout)
+  params_layout2 = QHBoxLayout()
+
+  label_rez1 = QLabel("Resolution.1")
+  label_rez2 = QLabel("Resolution.2")
+  label_c1 = QLabel("contour.1")
+  label_c2 = QLabel("contour.2")
+  
+  label_rez1.setFixedSize(120,30)
+  label_rez2.setFixedSize(120,30)
+  label_c1.setFixedSize(120,30)
+  label_c2.setFixedSize(120,30)
+  
+  tool._widget_rez1_dif = QLineEdit()
+  tool._widget_rez2_dif = QLineEdit()
+  tool._widget_c1_dif = QLineEdit()
+  tool._widget_c2_dif = QLineEdit()
+  
+  adv_box = QCheckBox("Advanced Options")
+  ac = _adv_dif_clicked(tool)
+  adv_box.stateChanged.connect(ac)
+  tool._widget_c1_dif.setEnabled(False)
+  tool._widget_c2_dif.setEnabled(False)
+
+  tool._widget_rez1_dif.setFixedSize(40,30)
+  tool._widget_rez2_dif.setFixedSize(40,30)
+  tool._widget_c1_dif.setFixedSize(40,30)
+  tool._widget_c2_dif.setFixedSize(40,30)
+
+  params_layout.addWidget(label_rez1)
+  params_layout.addWidget(tool._widget_rez1_dif)
+  params_layout.addWidget(label_rez2)
+  params_layout.addWidget(tool._widget_rez2_dif)
+ 
+  layout.addWidget(adv_box)
+
+  layout.addLayout(params_layout2)
+  params_layout2.addWidget(label_c1)
+  params_layout2.addWidget(tool._widget_c1_dif)
+  params_layout2.addWidget(label_c2)
+  params_layout2.addWidget(tool._widget_c2_dif)
+
+  tool._widget_rez1_dif.setText("10.0")
+  tool._widget_rez2_dif.setText("10.0")
+  tool._widget_c1_dif.setText("")
+  tool._widget_c2_dif.setText("")
+ 
+  button_dif = QPushButton("Generate DifMap")
+  button_dif.clicked.connect(tool._gen_difmap)
+  tool.dif_layout.addWidget(button_dif)
 
 def _sccc_scores_clicked(toptool):
   ''' A little closure over the tool in question.'''
@@ -286,13 +358,20 @@ def layout_main(tool):
   tab_nmi.setMinimumWidth(400)
   tab_nmi.setSizePolicy(policy)
   tab_widget.addTab(tab_nmi, "NMI")
+  
+  tab_dif = QWidget()
+  tab_dif.setMinimumHeight(210) 
+  tab_dif.setMinimumWidth(400)
+  tab_dif.setSizePolicy(policy)
+  tab_widget.addTab(tab_dif, "DIFMAP")
 
   # Now layout each tab
   layout_nmi(tool, tab_nmi)
   layout_sccc(tool, tab_sccc)
   layout_smoc(tool, tab_smoc)
   layout_ccc(tool, tab_ccc)
-  
+  layout_dif(tool, tab_dif)
+
   parent.setLayout(layout)
   layout.addWidget(tab_widget)
 

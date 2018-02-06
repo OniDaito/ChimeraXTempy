@@ -19,6 +19,39 @@ from chimerax.core.atomic.structure import AtomicStructure
 
 from .util import chimera_to_tempy_map, tempy_to_chimera_map
 
+from . import tool_select
+from . import tool_layout
+
+
+def tool_genmap(toptool):
+  """ Called from the GUI. """
+  # Check contours
+  contour1 = None
+  contour2 = None
+  if toptool._widget_c1_dif.isEnabled() and toptool._widget_c1_dif.isEnabled():        
+    try:
+      contour1 = float(toptool._widget_c1_dif.text())
+      contour2 = float(toptool._widget_c2_dif.text()) 
+    except:
+      toptool._show_error("Check the values fo contour1 and contour2")
+      return
+
+  # Find models
+  result, map0, map1 = tool_select.select_two(toptool)
+
+  if result:
+    if isinstance(map0, Volume) and isinstance(map1, Volume):
+       try:
+        rez1 = float(toptool._widget_rez1_dif.text())
+        rez2 = float(toptool._widget_rez2_dif.text())
+        genmap(toptool.session,map0,map1,rez1,rez2,contour1,contour2)
+       except:
+        toptool._show_error("Check the values for rez1 and rez2")
+        return
+    else :
+      toptool._show_error("Please select two maps.")
+      return
+
 def map_contour(m,t=-1.):
   c1 = None
   if t != -1.0:
@@ -27,7 +60,6 @@ def map_contour(m,t=-1.):
     else:
       c1 = 0.0
   return c1
-
 
 def genmap(session, map0 = None, map1 = None, rez1 = None, rez2 = None, c1 = None, c2 = None):
   """ Generate our new map."""
@@ -39,8 +71,10 @@ def genmap(session, map0 = None, map1 = None, rez1 = None, rez2 = None, c1 = Non
 
   #MAIN CALCULATION
   #whether to shift density to positive values
-  c1 = map_contour(m0,t=1.5)
-  c2 = map_contour(m1,t=1.5)
+  if c1 == None:
+    c1 = map_contour(m0,t=1.5)
+  if c2 == None:
+    c2 = map_contour(m1,t=1.5)
 
   c1 = (c1 - m0.min())
   c2 = (c2 - m1.min())
@@ -57,7 +91,12 @@ def genmap(session, map0 = None, map1 = None, rez1 = None, rez2 = None, c1 = Non
 
   #resample scaled maps to the common grid
   spacing = max(rez1,rez2)*0.33
-  print(spacing)
+
+  # Not sure we should do scaling here?
+  sc = ScoringFunctions()
+  emmap_1.fullMap,emmap_2.fullMap = sc._amplitude_match(m0,m1,0,0,0.02,0,0,max(rez1,rez2),lpfiltb=True,lpfilta=False,ref=False)
+
+
   apix_ratio = emmap_1.apix/spacing
   diff1 = emmap_1._interpolate_to_grid(grid_shape,spacing,new_ori,1)
   diff2 = emmap_2._interpolate_to_grid(grid_shape,spacing,new_ori,1)
@@ -79,35 +118,32 @@ def genmap(session, map0 = None, map1 = None, rez1 = None, rez2 = None, c1 = Non
   #shift to positive values
   diff1.fullMap = diff1.fullMap - min_scaled_maps
   diff2.fullMap = diff2.fullMap - min_scaled_maps
-
   #range of values in the scaled maps
   min1 = np.amin(diff1.fullMap[mask1.fullMap])
   diffc1 = min1+0.10*(np.amax(diff1.fullMap)-min1)
-  #print diffc1,min1,np.amax(diff1.fullMap), c1, c2
   min2 = np.amin(diff2.fullMap[mask2.fullMap])
   diffc2 = min2+0.10*(np.amax(diff2.fullMap)-min2)
       
-  print('calculating difference')
   #calculate difference
   diff_map = diff1.copy()
  
   #calculate difference
   diff1.fullMap = (diff1.fullMap - diff2.fullMap)
   diff2.fullMap = (diff2.fullMap - diff_map.fullMap)
-     
+ 
+  diff1.fullMap = diff1.fullMap*(mask1.fullMap)
+  diff2.fullMap = diff2.fullMap*(mask2.fullMap)
+    
   #interpolate back to original grids
   #mask1 = diff1._interpolate_to_grid1(m0.fullMap.shape,m0.apix,m0.origin,1,'zero')
   mask1 = diff1._interpolate_to_grid(m0.fullMap.shape,m0.apix,m0.origin,1,'zero')
   mask2 = diff2._interpolate_to_grid(m1.fullMap.shape,m1.apix,m1.origin,1,'zero')
 
-  nm0 = tempy_to_chimera_map(session, mask1)
-  nm1 = tempy_to_chimera_map(session, mask2)
-
-  print(dir(session.models))
-  session.models.add([nm0,nm1])
-
-
-
   # for assigning differences (see below), use positive differences
   mask1.fullMap = mask1.fullMap*(mask1.fullMap>0.)
   mask2.fullMap = mask2.fullMap*(mask2.fullMap>0.)  
+
+  nm0 = tempy_to_chimera_map(session, mask1)
+  nm1 = tempy_to_chimera_map(session, mask2)
+
+  session.models.add([nm0,nm1])

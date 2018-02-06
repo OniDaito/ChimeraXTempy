@@ -12,6 +12,7 @@ import os, math
 
 from . import tool_layout
 from . import tool_scores
+from . import difmap
 
 class ToolUI(ToolInstance):
 
@@ -49,7 +50,10 @@ class ToolUI(ToolInstance):
   def _nmi_score(self):
     ''' Run the nmi score, printing to the log'''
     tool_scores.nmi_score(self) 
-  
+
+  def _gen_difmap(self):
+    difmap.tool_genmap(self)
+
   def onclick(self, event):
     ''' This is called when we click on the graph. We check to see which residue we are closest to by rounding down. '''
     # TODO - move this to a more appropriate place I think
